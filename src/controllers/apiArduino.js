@@ -10,27 +10,5 @@ const salvarTelemtria = async (request, response) => { //função assincrona par
             });
         }
         const statusBomba = bomba_acionada ?? 0;
-
-        const insercaoLogs = `
-            INSERT INTO sensor_logs 
-            (temperatura_ar, umidade_ar, umidade_solo, bomba_acionada, created_at) 
-            VALUES (?, ?, ?, ?, NOW())
-        `;
-        
-        const [result] = await db.execute(insercaoLogs, [
-            temperatura_ar, 
-            umidade_ar, 
-            umidade_solo, 
-            statusBomba
-        ]);
-
-        return response.status(201).json({ 
-            message: 'Leitura gravada com sucesso.',
-            logId: result.insertId 
-        });
-
-    } catch (error) {
-        console.error('Erro ao salvar telemetria:', error);
-        return response.status(500).json({ error: 'Erro interno no servidor.' });
     }
 };
