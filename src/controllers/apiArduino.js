@@ -6,10 +6,10 @@ module.exports = {
 
     recepcaoTelemetria: function(request, response) {
 
-        const { temperatura_ar, umidade_ar, umidade_solo, bomba_acionada } = req.body;
+        const { temperatura_ar, umidade_ar, umidade_solo, bomba_acionada } = request.body;
 
         if (temperatura_ar === undefined || umidade_ar === undefined || umidade_solo === undefined) {
-            return res.status(400).json({ erro: 'Dados incompletos. Verifique os sensores.' });
+            return response.status(400).json({ erro: 'Dados incompletos. Verifique os sensores.' });
         }
 
         const dadosInsert= {
@@ -51,10 +51,10 @@ enviarConfiguracoes: function(request, response) {
             }
 
 			      if (results.length === 0) {
-                return res.status(404).json({ errr: 'Parâmetro não encontrado' });
+                return response.status(404).json({ errr: 'Parâmetro não encontrado' });
             }
 
-            return res.status(200).json(resultados[0]);
+            return response.status(200).json(resultados[0]);
         });
     }
 };
