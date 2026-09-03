@@ -17,18 +17,18 @@ module.exports = {
             umidade_ar: umidade_ar,
             umidade_solo: umidade_solo,
             bomba_acionada: bomba_acionada || 0,
-            created_at: new Date()
         };
 
-        const conexao = connectionFactory();
+        const conexao = connectionFactory(); //corrigir isso
+        conexao.query(sql, dadosInsert, callback); //corrigir isso
 
-        greenduinoBanco.insertTelemetria(dadosInsert, conexao, function(erro, resultado) {
+        greenduinoBanco.insertTelemetria(dadosInsert, conexao, function(err, resultado) {
   
             conexao.end();
 
-            if (erro) {
-                console.log('Erro ao salvar no banco:', erro);
-                return res.status(500).json({ erro: 'Erro ao salvar telemetria.' });
+            if (err) {
+                console.log('Erro ao salvar no banco:', err);
+                return response.status(500).json({ erro: 'Erro ao salvar telemetria.' });
             }
 
             res.status(201).json({ mensagem: 'Telemetria gravada' });
@@ -37,7 +37,7 @@ module.exports = {
 
 
 
-enviarConfiguracoes: function(request, response) {
+    enviarConfiguracoes: function(request, response) {
        
         const conexao = connectionFactory(); 
 
@@ -46,15 +46,15 @@ enviarConfiguracoes: function(request, response) {
             conexao.end(); 
             
             if (err) {
-                console.log('Erro ao buscar configurações:', erro);
-                return response.status(500).json({ erro: 'Erro interno do servidor.' });
+                console.log('Erro ao buscar configurações:', err);
+                return response.status(500).json({ err: 'Erro interno do servidor.' });
             }
 
 			      if (results.length === 0) {
-                return response.status(404).json({ errr: 'Parâmetro não encontrado' });
+                return response.status(404).json({ err: 'Parâmetro não encontrado' });
             }
 
-            return response.status(200).json(resultados[0]);
+            return response.status(200).json(results[0]);
         });
     }
 };
