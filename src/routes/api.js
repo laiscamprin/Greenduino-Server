@@ -4,6 +4,6 @@ const apiArduino = require('../controllers/apiArduino');
 
 router.post('/telemetria', apiArduino.recepcaoTelemetria);
 
-router.get('/parametros', apiArduino.envioParametros);
+router.get('/parametros/:token_estufa', apiArduino.envioParametros);
 
 module.exports = router;

@@ -1,57 +1,72 @@
 const connectionFactory = require('../config/connectionFactory');
-const greenduinoBanco = require('../config/greenduinoBanco')(); 
-
+const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
 
     recepcaoTelemetria: function(request, response) {
+        const { token_estufa, temperatura_ar, umidade_ar, umidade_solo, bomba_acionada } = request.body;
 
-        const { temperatura_ar, umidade_ar, umidade_solo, bomba_acionada } = request.body;
-
-        if (temperatura_ar === undefined || umidade_ar === undefined || umidade_solo === undefined) {
-            return response.status(400).json({ erro: 'Dados incompletos. Verifique os sensores.' });
+        if (!token_estufa || temperatura_ar === undefined || umidade_ar === undefined || umidade_solo === undefined) {
+            return response.status(400).json({ erro: 'Dados incompletos. Verifique o token_estufa e os sensores.' });
         }
 
-        const dadosInsert= {
-            temperatura_ar: temperatura_ar,
-            umidade_ar: umidade_ar,
-            umidade_solo: umidade_solo,
-            bomba_acionada: bomba_acionada || 0,
-        };
+        const connection = connectionFactory();
 
-        const conexao = connectionFactory(); //corrigir isso
-        conexao.query(sql, dadosInsert, callback); //corrigir isso
 
-        greenduinoBanco.insertTelemetria(dadosInsert, conexao, function(err, resultado) {
-  
-            conexao.end();
-
+        greenduinoBanco.idEstufa(token_estufa, connection, function(err, results) {
             if (err) {
-                console.log('Erro ao salvar no banco:', err);
-                return response.status(500).json({ erro: 'Erro ao salvar telemetria.' });
+                connection.end();
+                return response.status(500).json({ erro: 'Erro ao validar token da estufa.' });
             }
 
-            res.status(201).json({ mensagem: 'Telemetria gravada' });
+            if (results.length === 0) {
+                connection.end();
+                return response.status(404).json({ erro: 'Estufa não encontrada com o token informado.' });
+            }
+
+            const valorId = results[0].id_estufa;
+
+            const dadosInsert = {
+                id_estufa: valorId,
+                temperatura_ar: temperatura_ar,
+                umidade_ar: umidade_ar,
+                umidade_solo: umidade_solo,
+                bomba_acionada: bomba_acionada || 0,
+                data_hora: new Date()
+            };
+
+            greenduinoBanco.insertTelemetria(dadosInsert, connection, function(err) {
+                connection.end();
+
+                if (err) {
+                    console.log('Erro ao salvar no banco:', err);
+                    return response.status(500).json({ erro:'Erro ao salvar dados de telemetria.' });
+                }
+
+                return response.status(201).json({  resultado:'Telemetria gravada'});
+            });
         });
-    }, 
+    },
 
+    envioParametros: function(request, response) {
+        const { token_estufa } = request.params;
 
+        if (!token_estufa) {
+            return response.status(400).json({ erro: 'O token da estufa é obrigatório.' });
+        }
 
-    enviarConfiguracoes: function(request, response) {
-       
-        const conexao = connectionFactory(); 
+        const connection = connectionFactory();
 
-        greenduinoBanco.envioParametros(conexao, function(err, results) {
-      
-            conexao.end(); 
-            
+        greenduinoBanco.envioParametros(token_estufa, connection, function(err, results) {
+            connection.end();
+
             if (err) {
                 console.log('Erro ao buscar configurações:', err);
-                return response.status(500).json({ err: 'Erro interno do servidor.' });
+                return response.status(500).json({ erro: 'Erro interno do servidor.' });
             }
 
-			      if (results.length === 0) {
-                return response.status(404).json({ err: 'Parâmetro não encontrado' });
+            if (results.length === 0) {
+                return response.status(404).json({ erro: 'Estufa não encontrada ou sem espécie.' });
             }
 
             return response.status(200).json(results[0]);
