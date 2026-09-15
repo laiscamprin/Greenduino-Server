@@ -8,7 +8,15 @@ const pool = mysql.createPool({
     port: process.env.DB_PORT,
     ssl: {
         rejectUnauthorized: false 
-    }
+    },
+    waitForConnections: true, 
+    connectionLimit: 10,     
+    queueLimit: 0            
 });
+
+module.exports = async function() {
+    return await pool.getConnection();
+};
+
 
 module.exports = pool; 

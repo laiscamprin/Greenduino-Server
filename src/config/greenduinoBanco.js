@@ -10,9 +10,8 @@ module.exports = function() {
 
 
     this.envioParametros = function(tokenEstufa, connection, callback) {
-        connection.query(
-        'SELECT ep.umidade_minima, e.tempo_irrigacao FROM Estufa e, `Espécie` ep WHERE e.id_especie = ep.id_especie AND e.token_estufa = ?',
-        tokenEstufa, callback);
+       const sql =' SELECT ep.umidade_minima, e.tempo_irrigacao  FROM Estufa e INNER JOIN Especie ep ON e.id_especie = ep.id_especie  WHERE e.token_estufa = ?' ;
+            connection.query(sql, tokenEstufa, callback);
     };
     return this;
 };

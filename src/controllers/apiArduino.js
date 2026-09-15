@@ -2,7 +2,6 @@ const connectionFactory = require('../config/connectionFactory');
 const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
-
     recepcaoTelemetria: function(request, response) {
         const { token_estufa, temperatura_ar, umidade_ar, umidade_solo, bomba_acionada } = request.body;
 
@@ -12,15 +11,14 @@ module.exports = {
 
         const connection = connectionFactory();
 
-
         greenduinoBanco.idEstufa(token_estufa, connection, function(err, results) {
             if (err) {
-                connection.end();
+                connection.release();
                 return response.status(500).json({ erro: 'Erro ao validar token da estufa.' });
             }
 
             if (results.length === 0) {
-                connection.end();
+              connection.release();
                 return response.status(404).json({ erro: 'Estufa não encontrada com o token informado.' });
             }
 
@@ -31,19 +29,18 @@ module.exports = {
                 temperatura_ar: temperatura_ar,
                 umidade_ar: umidade_ar,
                 umidade_solo: umidade_solo,
-                bomba_acionada: bomba_acionada || 0,
-                data_hora: new Date()
+                bomba_acionada: bomba_acionada ? 1 : 0, 
             };
 
             greenduinoBanco.insertTelemetria(dadosInsert, connection, function(err) {
-                connection.end();
+           connection.release();
 
                 if (err) {
-                    console.log('Erro ao salvar no banco:', err);
-                    return response.status(500).json({ erro:'Erro ao salvar dados de telemetria.' });
+                    console.error('Erro ao salvar no banco:', err);
+                    return response.status(500).json({ erro: 'Erro ao salvar dados de telemetria.' });
                 }
 
-                return response.status(201).json({  resultado:'Telemetria gravada'});
+                return response.status(201).json({ resultado: 'Telemetria gravada' });
             });
         });
     },
@@ -58,15 +55,14 @@ module.exports = {
         const connection = connectionFactory();
 
         greenduinoBanco.envioParametros(token_estufa, connection, function(err, results) {
-            connection.end();
-
+            connection.release();
             if (err) {
-                console.log('Erro ao buscar configurações:', err);
+                console.error('Erro ao buscar configurações:', err);
                 return response.status(500).json({ erro: 'Erro interno do servidor.' });
             }
 
             if (results.length === 0) {
-                return response.status(404).json({ erro: 'Estufa não encontrada ou sem espécie.' });
+                return response.status(404).json({ erro: 'Estufa não encontrada ou sem espécie atrelada.' });
             }
 
             return response.status(200).json(results[0]);
