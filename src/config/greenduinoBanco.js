@@ -42,5 +42,25 @@ module.exports = function() {
         connection.query(sql, [id_estufa, parseInt(valor)], callback);
     };
 
-    return this;
+        // Métodos de Espécies em greenduinoBanco.js
+    this.cadastrarEspecie = function(especie, connection, callback) {
+        connection.query('INSERT INTO especies SET ?', especie, callback);
+    };
+
+    this.listarEspecies = function(connection, callback) {
+        connection.query('SELECT * FROM especies ORDER BY nome_especie ASC', callback);
+    };
+
+    this.buscarEspeciePorId = function(id_especie, connection, callback) {
+        connection.query('SELECT * FROM especies WHERE id_especie = ?', id_especie, callback);
+    };
+
+    this.alterarEspecie = function(id_especie, dados, connection, callback) {
+        connection.query('UPDATE especies SET ? WHERE id_especie = ?', [dados, id_especie], callback);
+    };
+
+    this.excluirEspecie = function(id_especie, connection, callback) {
+        connection.query('DELETE FROM especies WHERE id_especie = ?', id_especie, callback);
+    };
+        return this;
 };

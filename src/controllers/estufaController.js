@@ -4,7 +4,6 @@ const greenduinoBanco = require('../config/greenduinoBanco')();
 module.exports = {
 
     cadastrarEstufa: function(req, res) {
-        // O token_estufa é recebido no corpo da requisição, enviado pelo Arduino/Usuário
         const { nome_estufa, id_usuario, id_especie, token_estufa, tempo_irrigacao } = req.body;
 
         if (!nome_estufa || !id_usuario || !id_especie || !token_estufa) {

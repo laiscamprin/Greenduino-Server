@@ -19,4 +19,10 @@ router.get('/estufas/:id_estufa', estufasController.buscarPorId);
 router.put('/estufas/:id_estufa', estufasController.atualizarEstufa);
 router.delete('/estufas/:id_estufa', estufasController.excluirEstufa);
 
+// Espécies (CRUD completo)
+router.post('/especies', especiesController.cadastrarEspecie);
+router.get('/especies', especiesController.listarEspecies);
+router.get('/especies/:id_especie', especiesController.buscarPorId);
+router.put('/especies/:id_especie', especiesController.atualizarEspecie);
+router.delete('/especies/:id_especie', especiesController.excluirEspecie);
 module.exports = router;
