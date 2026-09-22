@@ -2,6 +2,7 @@ const connectionFactory = require('../config/connectionFactory');
 const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
+
     recepcaoTelemetria: function(request, response) {
         const { token_estufa, temperatura_ar, umidade_ar, umidade_solo, bomba_acionada } = request.body;
 
