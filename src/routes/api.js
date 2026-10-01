@@ -8,10 +8,6 @@ const estufasController = require('../controllers/estufaController');
 router.post('/telemetria', apiArduino.recepcaoTelemetria);
 router.get('/parametros/:token_estufa', apiArduino.envioParametros);
 
-// Espécies
-router.post('/especies', especiesController.cadastrarEspecie);
-router.get('/especies', especiesController.listarEspecies);
-
 // Estufas (CRUD completo)
 router.post('/estufas', estufasController.cadastrarEstufa);
 router.get('/estufas/usuario/:id_usuario', estufasController.listarEstufas);
