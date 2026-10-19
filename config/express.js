@@ -13,5 +13,12 @@ module.exports = function() {
 
     const rotasUsuario = require('../src/routes/usuario');
     app.use('/usuario', rotasUsuario);
+
+    const rotasDashboard = require('../src/routes/dashboard');
+    app.use('/dashboard', rotasDashboard);
+
+    const rotasPainel = require('../src/routes/painel');
+    app.use('/painel', rotasPainel);
     return app;
+
 };

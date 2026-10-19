@@ -46,7 +46,7 @@ module.exports ={
 
             let filtroParametro = resultados;
 
-            if (filtroParametro !== 'todos') {
+            if (parametro !== 'todos') {
                 filtroParametro = resultados.map(item => {
                     return {
                         periodo: item.periodo,

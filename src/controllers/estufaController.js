@@ -34,6 +34,8 @@ module.exports = {
                 mensagem: 'Estufa cadastrada com sucesso!',
                 id_estufa: result.insertId
             });
+
+            //res.redirect('..painelController/painel');
         });
     },
 
