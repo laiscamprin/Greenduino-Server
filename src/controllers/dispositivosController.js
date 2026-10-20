@@ -3,7 +3,6 @@ const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
 
-    // Renderiza a página principal do painel listando todas as estufas do usuário logado
     renderDispositivos: function(req, res, next) {
         const connection = connectionFactory();
         const id_usuario = req.session.usuario.id_usuario;

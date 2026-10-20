@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="icon" href="/assets/icons/favicon.png">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-logo">
+            <img src="/assets/icons/favicon.png" alt="Greenduino" width="85" height="85">
+        </div>
+        <h1 class="auth-title">Entrar no Greenduino</h1>
+        
+        <div class="auth-card">
+            <form onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <label for="email">E-mail ou usuário</label>
+                    <input type="text" id="email" required autofocus>
+                </div>
+                
+                <div class="input-group">
+                    <div class="label-row">
+                        <label for="senha">Senha</label>
+                        <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                    </div>
+                    <input type="password" id="senha" required>
+                </div>
+                
+                <button type="submit" class="btn-auth-submit">Entrar</button>
+            </form>
+        </div>
+        
+        <div class="auth-redirect">
+            Novo por aqui? <a href="/usuario/cadastro">Crie sua conta</a>.
+        </div>
+    </div>
+</body>
+</html>

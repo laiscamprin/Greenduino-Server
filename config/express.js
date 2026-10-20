@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const session = require('express-session');
 
 module.exports = function() {
 
@@ -11,6 +12,13 @@ module.exports = function() {
     app.use(express.static('./public'));
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, '../src/views'));
+    app.use(express.urlencoded({ extended: true }));
+
+    app.use(session({
+        secret: 'chave',
+        resave: false,
+        saveUninitialized: false
+    }));
 
     const rotasArduino = require('../src/routes/api');
     app.use('/api', rotasArduino);

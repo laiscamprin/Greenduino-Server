@@ -3,6 +3,40 @@ const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
 
+    
+    listarEstufas: function(req, res) {
+        const { id_usuario } = req.params;
+        const connection = connectionFactory();
+
+        greenduinoBanco.listarEstufas(id_usuario, connection, function(err, results) {
+            connection.release();
+
+            if (err) {
+                console.error('Erro ao buscar estufas:', err);
+                return res.status(500).json({ erro: 'Erro interno ao buscar estufas.' });
+            }
+            return res.status(200).json(results);
+        });
+    },
+
+    buscarPorId: function(req, res) {
+        const { id_estufa } = req.params;
+        const connection = connectionFactory();
+
+        greenduinoBanco.buscarEstufaPorId(id_estufa, connection, function(err, results) {
+            connection.release();
+
+            if (err) {
+                console.error('Erro ao buscar detalhe da estufa:', err);
+                return res.status(500).json({ erro: 'Erro ao buscar detalhes da estufa.' });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ erro: 'Estufa não encontrada.' });
+            }
+            return res.status(200).json(results[0]);
+        });
+    },
+
    cadastrarEstufa: function(req, res, next) {
         // Pega o id_usuario direto da sessão por segurança
         const id_usuario = req.session.usuario ? req.session.usuario.id_usuario : req.body.id_usuario;

@@ -7,7 +7,7 @@ module.exports = {
 
 
     renderCadastro: function(req, res) {
-        res.render('autenticacao/registro', { errosValidacao: {}, usuario: {} });
+        res.render('autenticacao/cadastro', { errosValidacao: {}, usuario: {} });
     },
 
     cadastrarUsuario: [
@@ -21,28 +21,31 @@ module.exports = {
             return true;
         }),
 
-        function(req, res, next) {
+        async function(req, res, next) {
+            console.log("DADOS RECEBIDOS DO FORMULÁRIO:", req.body);
             var usuario = req.body;
             var erros = validationResult(req);
 
             if (!erros.isEmpty()) {
-                return res.status(400).render('autenticacao/registro', {
+                return res.status(400).render('autenticacao/cadastro', {
                     errosValidacao: erros.mapped(),
                     usuario: usuario
                 });
             }
 
-            var connection = connectionFactory();
+            var connection = await connectionFactory();
 
+            console.log("dps do connection foi");
             usuariosBanco.buscaPorEmail(usuario.email, connection, function(err, results) {
+                 console.log("chegou no banco");
                 if (err) {
-                    connection.end();
+                    connection.release()
                     return next(err);
                 }
 
                 if (results.length > 0) {
-                    connection.end();
-                    return res.status(400).render('autenticacao/registro', {
+                    connection.release()
+                    return res.status(400).render('autenticacao/cadastro', {
                         errosValidacao: { email: { msg: 'Este e-mail já está cadastrado!' } },
                         usuario: usuario
                     });
@@ -51,6 +54,7 @@ module.exports = {
                 delete usuario.confirmarSenha;
         
                 usuariosBanco.salva(usuario, connection, function(err, results) {
+                    console.log("até aqui foi");
                     connection.end();
                     if (err) return next(err);
                     res.redirect('/login');

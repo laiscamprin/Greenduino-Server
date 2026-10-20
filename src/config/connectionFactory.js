@@ -1,5 +1,6 @@
-const mysql = require('mysql2/promise'); 
+const mysql = require('mysql2'); 
 require('dotenv').config(); 
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -10,13 +11,13 @@ const pool = mysql.createPool({
         rejectUnauthorized: false 
     },
     waitForConnections: true, 
-    connectionLimit: 10,     
-    queueLimit: 0            
+    connectionLimit: 10,    
+    queueLimit: 0,
+    enableKeepAlive: true,        
+    keepAliveInitialDelay: 10000,
+    connectTimeout: 10000 
 });
 
 module.exports = async function() {
-    return await pool.getConnection();
+  return pool;
 };
-
-
-module.exports = pool; 

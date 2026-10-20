@@ -4,10 +4,10 @@ const dispositivosController = require('../controllers/dispositivosController');
 var sessao = require('../middlewares/autenticacao');
 
 
-router.get('/dispositivos', sessao, dispositivosController.renderPainel);
+router.get('/dispositivos', sessao, dispositivosController.renderDispositivos);
 
-router.post('/dispositivos/cadastrarEstufa', sessao, dispositivosController.cadastrarEstufa);
-router.post('/dispositivos/editarEstufa', sessao, dispositivosController.editarEstufa);
+router.post('/dispositivos/cadastrarEstufa', sessao, dispositivosController.renderCadastro);
+router.post('/dispositivos/editarEstufa', sessao, dispositivosController.renderEdicao);
 
 //router.get('/painel/excluir/:id', sessao, estufasController.excluirEstufa);
 
