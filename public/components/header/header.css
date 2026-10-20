@@ -1,0 +1,47 @@
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-glass);
+}
+.header-content {
+  display: flex; justify-content: space-between; align-items: center; height: 80px;
+}
+.logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.logo span {
+  color: var(--text-main);
+}
+
+.text span {
+  color: var(--green-primary);
+}
+nav ul {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.3s;
+}
+nav a:hover {
+  color: var(--green-primary);
+}

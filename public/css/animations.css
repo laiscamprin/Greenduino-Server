@@ -1,0 +1,10 @@
+@keyframes moveAndBlink {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  50% { opacity: 0.9; transform: translate(calc(var(--move-x) / 2), calc(var(--move-y) / 2)) scale(1.2); }
+  100% { opacity: 0; transform: translate(var(--move-x), var(--move-y)) scale(0.5); }
+}
+
+@keyframes glideWave {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

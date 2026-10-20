@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="auth.css">
+    <link rel="icon" href="../../../public/assets/icons/favicon.png">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-logo">
+            <img src="../../../public/assets/icons/favicon.png" alt="Greenduino" width="85" height="85">
+        </div>
+        <h1 class="auth-title">Crie sua conta no Greenduino</h1>
+        
+        <div class="auth-card">
+            <form onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <label for="nome">Nome completo</label>
+                    <input type="text" id="nome" required autofocus>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" required>
+                </div>
+                
+                <button type="submit" class="btn-auth-submit">Cadastrar</button>
+            </form>
+        </div>
+        
+        <div class="auth-redirect">
+            Já tem uma conta? <a href="../login/login.html">Entrar</a>.
+        </div>
+    </div>
+</body>
+</html>

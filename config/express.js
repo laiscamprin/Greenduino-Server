@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 module.exports = function() {
 
@@ -7,6 +8,9 @@ module.exports = function() {
 
     app.use(cors());
     app.use(express.json());
+    app.use(express.static('./public'));
+    app.set('view engine', 'ejs');
+    app.set('views', path.join(__dirname, '../src/views'));
 
     const rotasArduino = require('../src/routes/api');
     app.use('/api', rotasArduino);
@@ -17,8 +21,12 @@ module.exports = function() {
     const rotasDashboard = require('../src/routes/dashboard');
     app.use('/dashboard', rotasDashboard);
 
-    const rotasPainel = require('../src/routes/painel');
-    app.use('/painel', rotasPainel);
+    const rotasDispositivos = require('../src/routes/dispositivos');
+    app.use('/dispositivos', rotasDispositivos);
+
+    const rotasHome = require('../src/routes/home');
+    app.use('/', rotasHome);
+
     return app;
 
 };

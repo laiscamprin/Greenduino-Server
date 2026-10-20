@@ -1,0 +1,68 @@
+#hero {
+  position: relative; height: 100vh; display: flex; align-items: center; justify-content: center;
+  text-align: center; overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, var(--bg-surface) 0%, var(--bg-base) 100%);
+}
+#hero .container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+#hero h1 {
+  font-size: 4.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #ffffff, var(--green-primary));
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+#hero p {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  max-width: 650px;
+}
+#particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #fff, 0 0 20px var(--green-primary);
+  opacity: 0;
+  animation: moveAndBlink linear infinite;
+}
+.waves-container {
+  position: absolute;
+  bottom: 0;
+  left: 0; width: 100%; height: 200px; overflow: hidden; z-index: 2; pointer-events: none; }
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 50% 100%;
+}
+.wave1 {
+  background-image: url('/assets/wave1.svg');
+  animation: glideWave 25s linear infinite;
+}
+.wave2 {
+  background-image: url('/assets/wave2.svg');
+  animation: glideWave 20s linear infinite reverse;
+}

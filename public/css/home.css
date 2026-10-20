@@ -1,0 +1,50 @@
+.content-section {
+    padding: 6rem 0;
+    position: relative;
+    background: linear-gradient(to bottom, #043121f9 0%, #032318f9 80%);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--green-primary);
+}
+
+.about-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--bg-surface-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.about-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    display: block;
+}
+
+.about-text {
+    padding: 1.2rem 3rem 3rem 3rem; 
+    text-align: center;
+}
+
+.about-text h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+    font-size: 1.8rem;
+}
+
+.about-text p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
