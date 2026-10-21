@@ -4,7 +4,7 @@ const dispositivosController = require('../controllers/dispositivosController');
 var sessao = require('../middlewares/autenticacao');
 
 
-router.get('/dispositivos', sessao, dispositivosController.renderDispositivos);
+router.get('/', sessao, dispositivosController.renderDispositivos);
 
 router.post('/dispositivos/cadastrarEstufa', sessao, dispositivosController.renderCadastro);
 router.post('/dispositivos/editarEstufa', sessao, dispositivosController.renderEdicao);

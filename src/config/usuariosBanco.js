@@ -13,6 +13,8 @@ module.exports = function() {
     this.salva = function(usuario, connection, callback) {
         var salt = bcrypt.genSaltSync(10);
         usuario.senha = bcrypt.hashSync(usuario.senha, salt);
+        usuario.nome_usuario = usuario.nome;
+        delete usuario.nome;
     
         connection.query('INSERT INTO usuarios SET ?', usuario, callback);
     };

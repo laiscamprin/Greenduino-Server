@@ -15,10 +15,10 @@
         <h1 class="auth-title">Entrar no Greenduino</h1>
         
         <div class="auth-card">
-            <form onsubmit="event.preventDefault();">
+            <form action="/usuario/login" method="post">
                 <div class="input-group">
-                    <label for="email">E-mail ou usuário</label>
-                    <input type="text" id="email" required autofocus>
+                    <label for="email">E-mail</label>
+                    <input type="text" id="email"name="email" required autofocus>
                 </div>
                 
                 <div class="input-group">
@@ -26,7 +26,7 @@
                         <label for="senha">Senha</label>
                         <a href="#" class="forgot-password">Esqueceu a senha?</a>
                     </div>
-                    <input type="password" id="senha" required>
+                    <input type="password" id="senha" name="senha">
                 </div>
                 
                 <button type="submit" class="btn-auth-submit">Entrar</button>

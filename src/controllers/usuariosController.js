@@ -39,12 +39,12 @@ module.exports = {
             usuariosBanco.buscaPorEmail(usuario.email, connection, function(err, results) {
                  console.log("chegou no banco");
                 if (err) {
-                    connection.release()
+                    console.error("ERRO NO buscaPorEmail:", err);
                     return next(err);
                 }
 
                 if (results.length > 0) {
-                    connection.release()
+                
                     return res.status(400).render('autenticacao/cadastro', {
                         errosValidacao: { email: { msg: 'Este e-mail já está cadastrado!' } },
                         usuario: usuario
@@ -55,9 +55,9 @@ module.exports = {
         
                 usuariosBanco.salva(usuario, connection, function(err, results) {
                     console.log("até aqui foi");
-                    connection.end();
+    
                     if (err) return next(err);
-                    res.redirect('/login');
+                    res.redirect('/usuario/login');
                 });
             });
         }
@@ -67,7 +67,7 @@ module.exports = {
         res.render('autenticacao/login', { erro: null });
     },
 
-    login: function(req, res, next) {
+    login: async function(req, res, next) {
         var email = req.body.email;
         var senha = req.body.senha;
 
@@ -89,16 +89,14 @@ module.exports = {
             req.session.tentativas = 0;
         }
 
-        var connection = connectionFactory();
+         var connection = await connectionFactory();
 
         usuariosBanco.buscaPorEmail(email, connection, function(err, results) {
             if (err) {
-                connection.end();
                 return next(err);
             }
 
             if (results.length === 0) {
-                connection.end();
                 return res.render('autenticacao/login', { erro: 'E-mail ou senha inválidos!' });
             }
 
@@ -117,7 +115,6 @@ module.exports = {
                     mensagem = `E-mail ou senha inválidos! Você tem mais ${restantes} tentativa(s).`;
                 }
 
-                connection.end();
                 return res.render('autenticacao/login', { erro: mensagem });
             }
 
@@ -125,14 +122,13 @@ module.exports = {
             delete req.session.tentativasLogin;
 
             req.session.usuario = {
-                id: usuario.id_usuario || usuario.id,
-                nome: usuario.nome,
+                id: usuario.id_usuario,
+                nome: usuario.nome_usuario,
                 email: usuario.email,
                 admin: usuario.admin
             };
 
-            connection.end(); 
-            res.redirect('/produtos');
+            res.redirect('/dispositivos');
         });
     },
 

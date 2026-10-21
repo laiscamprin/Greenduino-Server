@@ -3,12 +3,11 @@ const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
 
-    renderDispositivos: function(req, res, next) {
-        const connection = connectionFactory();
-        const id_usuario = req.session.usuario.id_usuario;
+    renderDispositivos: async function(req, res, next) {
+       var connection = await connectionFactory();
+        const id_usuario = req.session.usuario.id;
 
         greenduinoBanco.listarEstufas(id_usuario, connection, function(err, estufas) {
-            connection.end();
 
             if (err) {
                 console.error('Erro ao listar estufas no painel:', err);
@@ -16,7 +15,7 @@ module.exports = {
             }
 
          
-            res.render('painel/index', {
+            res.render('dispositivos/index', {
                 usuario: req.session.usuario,
                 estufas: estufas
             });
