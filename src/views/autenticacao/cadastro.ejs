@@ -3,51 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro</title>
+    <title>Cadastro | Greenduino</title>
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="icon" href="/assets/icons/favicon.png">
 </head>
-<body>
-    <div class="auth-container">
-        <div class="auth-logo">
-            <img src="/assets/icons/favicon.png" alt="Greenduino" width="85" height="85">
-        </div>
-        <h1 class="auth-title">Crie sua conta no Greenduino</h1>
-        
-        <div class="auth-card">
-            <form action="/usuario/cadastro" method="post">
-                <div class="input-group">
-                    <label for="nome">Nome completo</label>
-                    <input name="nome"  type="text" id="nome" required autofocus>
-                </div>
+//ia slop ent é legal dar uma revisada no código, mas não é necessário fazer alterações significativas. O código parece estar bem estruturado e funcional.
+//eu acho.
+<body class="auth-page">
+    <%
+        var erros = (typeof errosValidacao !== 'undefined' && errosValidacao) ? errosValidacao : {};
+        var dados = (typeof usuario !== 'undefined' && usuario) ? usuario : {};
+    %>
 
-                <div class="input-group">
-                    <label for="email">E-mail</label>
-                    <input name="email" type="email" id="email" required>
-                </div>
+    <main class="auth-shell">
+        <aside class="auth-visual">
+            <div class="auth-visual-top">
+                <a href="/" class="auth-brand">
+                    <img src="/assets/icons/favicon.png" alt="">
+                    <span>Green<span>duino</span></span>
+                </a>
+                <a href="/" class="auth-back">
+                    Voltar ao início
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+            </div>
 
-                <div class="input-group">
-                    <label for="telefone">Telefone</label>
-                    <input name="telefone" type="text" id="telefone" required>
-                </div>
+            <div>
+                <p class="auth-tagline">Crie sua conta e comece a cultivar com tecnologia.</p>
+                <p class="auth-tagline-sub">Acompanhe sua estufa e seus dispositivos em um só lugar.</p>
+            </div>
+        </aside>
 
-                <div class="input-group">
-                    <label for="senha">Senha</label>
-                    <input name="senha" type="password" id="senha" required>
-                </div>
-                
-                <div class="input-group">
-                    <label for="confirmarSenha">Confirmar Senha</label>
-                    <input name="confirmarSenha" type="password" id="confirmarSenha" required>
-                </div>
-                
-                <button type="submit" class="btn-auth-submit">Cadastrar</button>
-            </form>
-        </div>
-        
-        <div class="auth-redirect">
-            Já tem uma conta? <a href="/login">Entrar</a>.
-        </div>
-    </div>
+        <section class="auth-form-panel">
+            <div class="auth-form-wrap">
+                <h1 class="auth-title">Crie sua conta</h1>
+                <p class="auth-subtitle">
+                    Já tem uma conta? <a href="/usuario/login">Entrar</a>
+                </p>
+
+                <form class="auth-form" action="/usuario/cadastro" method="post">
+                    <div class="input-group">
+                        <label for="nome">Nome completo</label>
+                        <input name="nome" type="text" id="nome" placeholder="Seu nome" autocomplete="name" value="<%= dados.nome || '' %>" class="<%= erros.nome ? 'has-error' : '' %>" required autofocus>
+                        <% if (erros.nome) { %><span class="field-error" role="alert"><%= erros.nome.msg %></span><% } %>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="email">E-mail</label>
+                            <input name="email" type="email" id="email" placeholder="seuemail@exemplo.com" autocomplete="email" value="<%= dados.email || '' %>" class="<%= erros.email ? 'has-error' : '' %>" required>
+                            <% if (erros.email) { %><span class="field-error" role="alert"><%= erros.email.msg %></span><% } %>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="telefone">Telefone</label>
+                            <input name="telefone" type="text" id="telefone" inputmode="tel" placeholder="(00) 00000-0000" autocomplete="tel" value="<%= dados.telefone || '' %>" class="<%= erros.telefone ? 'has-error' : '' %>" required>
+                            <% if (erros.telefone) { %><span class="field-error" role="alert"><%= erros.telefone.msg %></span><% } %>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="senha">Senha</label>
+                            <div class="password-field">
+                                <input name="senha" type="password" id="senha" placeholder="Mín. 6 caracteres" autocomplete="new-password" minlength="6" class="<%= erros.senha ? 'has-error' : '' %>" required>
+                                <button type="button" class="toggle-password" data-toggle-password aria-label="Mostrar senha" aria-pressed="false">
+                                    <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.1M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                                </button>
+                            </div>
+                            <% if (erros.senha) { %><span class="field-error" role="alert"><%= erros.senha.msg %></span><% } %>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="confirmarSenha">Confirmar senha</label>
+                            <div class="password-field">
+                                <input name="confirmarSenha" type="password" id="confirmarSenha" placeholder="Repita a senha" autocomplete="new-password" class="<%= erros.confirmarSenha ? 'has-error' : '' %>" required>
+                                <button type="button" class="toggle-password" data-toggle-password aria-label="Mostrar senha" aria-pressed="false">
+                                    <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18 18 0 0 1 4.1-5.1M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                                </button>
+                            </div>
+                            <% if (erros.confirmarSenha) { %><span class="field-error" role="alert"><%= erros.confirmarSenha.msg %></span><% } %>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit">Cadastrar</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="/utils/authForm.js"></script>
 </body>
 </html>
