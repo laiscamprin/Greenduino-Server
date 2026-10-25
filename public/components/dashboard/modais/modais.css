@@ -1,0 +1,186 @@
+dialog {
+    color: var(--text-main);
+    background: #111e16;
+    border: 1px solid #3a4b40;
+    border-radius: 12px;
+    width: min(490px, calc(100% - 32px));
+    padding: 28px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    box-shadow: 0 24px 90px #0009;
+}
+
+dialog::backdrop {
+    background: #020a07bb;
+    backdrop-filter: blur(6px);
+}
+
+body:has(dialog[open]) {
+    overflow: hidden;
+}
+
+dialog h2 {
+    font-size: 22px;
+    margin: 7px 0 10px;
+}
+
+dialog h2+p, #descricao-excluir {
+    color: #afc5b7;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.modal-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #244b33;
+    color: #b3edc7;
+}
+
+.modal-icon.danger {
+    background: #4b2b24;
+    color: #f8b3a6;
+}
+
+.cultivation-dimensions {
+    min-width: 0;
+    margin: 22px 0 0;
+    padding: 0;
+    border: 0;
+}
+
+.cultivation-dimensions legend {
+    padding: 0;
+    font-size: 12px;
+    color: #d6e8dc;
+}
+
+.cultivation-dimensions > p {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #9eb7a7;
+}
+
+.dimensions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dimensions-grid .input-group {
+    min-width: 0;
+    margin-top: 12px;
+}
+
+@media (max-width: 420px) {
+    .dimensions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-group {
+    margin-top: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #d6e8dc;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    color: #eef8f2;
+    background: #0a1a11;
+    border: 1px solid #3a5544;
+    padding: 12px;
+    min-height: 46px;
+}
+
+.input-group input::placeholder {
+    color: #8aa794;
+}
+
+.input-group small {
+    display: block;
+    color: #9eb7a7;
+    font-size: 10px;
+    margin-top: 7px;
+}
+
+.form-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 11px;
+    color: #adc4b4;
+    background: #1a3021;
+    border-radius: 9px;
+    padding: 12px;
+    margin-top: 22px;
+}
+
+.form-note .icon {
+    width: 17px;
+    height: 17px;
+}
+
+.field-error {
+    color: #ffc1b8;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+    border-top: 1px solid #2c4936;
+    padding-top: 20px;
+}
+
+.help-item {
+    margin-top: 20px;
+}
+
+.help-item h3 {
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+.help-item p {
+    color: #b4cbbd;
+    font-size: 12px;
+}
+
+.help-close {
+    width: 100%;
+    margin-top: 24px;
+}
+
+@media (max-width: 620px) {
+    dialog {
+        padding: 22px;
+    }
+
+    dialog h2 {
+        font-size: 22px;
+    }
+
+    .modal-actions .button {
+        flex: 1;
+        padding-inline: 8px;
+    }
+}

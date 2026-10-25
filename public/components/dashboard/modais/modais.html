@@ -1,0 +1,79 @@
+<dialog id="modal-planta" aria-labelledby="titulo-formulario" aria-describedby="descricao-formulario">
+    <form id="form-planta">
+        <div class="modal-heading">
+            <span class="modal-icon"><svg class="icon"><use href="#icon-leaf"/></svg></span>
+            <button type="button" class="icon-button" data-fechar aria-label="Fechar cadastro"><svg class="icon"><use href="#icon-close"/></svg></button>
+        </div>
+        <h2 id="titulo-formulario">Cadastrar planta</h2>
+        <p id="descricao-formulario">Dê um nome à sua planta, informe o espaço de cultivo e o token do seu Greenduino.</p>
+        <input type="hidden" id="id_estufa" name="id_estufa">
+        <div class="input-group">
+            <label for="nome_estufa">Nome da planta ou do cultivo</label>
+            <input id="nome_estufa" name="nome_estufa" placeholder="Ex.: Manjericão da cozinha" maxlength="80" required autocomplete="off">
+        </div>
+        <div class="input-group"><label for="id_especie">Qual é a espécie?</label><select id="id_especie" name="id_especie" required></select></div>
+        <fieldset class="cultivation-dimensions" aria-describedby="ajuda-medidas">
+            <legend>Tamanho do vaso ou da área de cultivo</legend>
+            <p id="ajuda-medidas">Informe as três medidas em centímetros (cm).</p>
+            <div class="dimensions-grid">
+                <div class="input-group">
+                    <label for="altura">Altura (cm)</label>
+                    <input type="number" id="altura" name="altura" min="0.1" step="0.1" inputmode="decimal" placeholder="Ex.: 25" required>
+                </div>
+                <div class="input-group">
+                    <label for="largura">Largura (cm)</label>
+                    <input type="number" id="largura" name="largura" min="0.1" step="0.1" inputmode="decimal" placeholder="Ex.: 30" required>
+                </div>
+                <div class="input-group">
+                    <label for="comprimento">Comprimento (cm)</label>
+                    <input type="number" id="comprimento" name="comprimento" min="0.1" step="0.1" inputmode="decimal" placeholder="Ex.: 30" required>
+                </div>
+            </div>
+        </fieldset>
+        <div class="input-group">
+            <label for="token_estufa">Código do token do Greenduino</label>
+            <input type="text" id="token_estufa" name="token_estufa" placeholder="Ex.: GRD-AB12-CD34" maxlength="255" autocomplete="off" autocapitalize="none" spellcheck="false" required aria-describedby="ajuda-dispositivo">
+            <small id="ajuda-dispositivo">Digite o código que acompanha sua unidade. Nesta prévia, a conexão é apenas ilustrativa.</small>
+        </div>
+        <div class="form-note">
+            <svg class="icon"><use href="#icon-info"/></svg>
+            <p>A espécie ajuda a contextualizar os indicadores. As faixas desta prévia são ilustrativas, não recomendações de cultivo.</p>
+        </div>
+        <p id="erro-formulario" class="field-error" role="alert"></p>
+        <div class="modal-actions">
+            <button type="button" class="button button-secondary" data-fechar>Cancelar</button>
+            <button type="submit" class="button button-primary" id="salvar-planta">Cadastrar planta</button>
+        </div>
+    </form>
+</dialog>
+<dialog id="modal-excluir" aria-labelledby="titulo-excluir" aria-describedby="descricao-excluir">
+    <div class="modal-heading">
+        <span class="modal-icon danger"><svg class="icon"><use href="#icon-trash"/></svg></span>
+        <button class="icon-button" data-fechar aria-label="Fechar confirmação"><svg class="icon"><use href="#icon-close"/></svg></button>
+    </div>
+    <h2 id="titulo-excluir">Excluir esta planta?</h2>
+    <p id="descricao-excluir"></p>
+    <div class="modal-actions">
+        <button class="button button-secondary" data-fechar autofocus>Manter planta</button>
+        <button class="button button-danger" id="confirmar-exclusao">Excluir planta</button>
+    </div>
+</dialog>
+<dialog id="modal-ajuda" aria-labelledby="titulo-ajuda">
+    <div class="modal-heading">
+        <span class="modal-icon"><svg class="icon"><use href="#icon-info"/></svg></span>
+        <button class="icon-button" data-fechar aria-label="Fechar explicação"><svg class="icon"><use href="#icon-close"/></svg></button>
+    </div>
+    <h2 id="titulo-ajuda">Sobre os indicadores</h2>
+    <div class="help-item">
+        <h3>Umidade do solo</h3>
+        <p>Mostra quanta umidade o sensor percebe na terra. Um número menor representa um solo mais seco.</p>
+    </div>
+    <div class="help-item"><h3>Temperatura do ar</h3><p>É a temperatura perto da planta, em graus Celsius (°C).</p></div>
+    <div class="help-item"><h3>Umidade do ar</h3><p>Indica a quantidade de umidade no ambiente. É diferente da umidade da terra.</p></div>
+    <div class="help-item">
+        <h3>Irrigação e histórico</h3>
+        <p>A irrigação indica se a bomba está ligada. No histórico, escolha linhas, barras ou tabela para acompanhar as leituras.</p>
+    </div>
+    <div class="form-note"><p>Todos os valores, estados e faixas são exemplos. Nenhum comando é enviado a um dispositivo.</p></div>
+    <button class="button button-primary help-close" data-fechar>Entendi</button>
+</dialog>

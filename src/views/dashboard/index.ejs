@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#040d08">
+        <title>Meu cultivo | Greenduino</title>
+        <link rel="icon" href="/assets/icons/favicon.png">
+        <link rel="stylesheet" href="/css/dashboard.css">
+    </head>
+    <body class="dashboard-page">
+        <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+        <div id="dashboard-icones-placeholder" data-dashboard-component aria-hidden="true"></div>
+        <p id="dashboard-loading" role="status">Carregando dashboard...</p>
+        <div id="dashboard-conteudo" class="dashboard-shell" hidden>
+            <aside id="dashboard-menu-placeholder" class="sidebar" data-dashboard-component></aside>
+            <div class="workspace">
+                <header class="topbar">
+                    <div class="breadcrumb">Meu espaço <span>/</span><strong id="pagina-atual">Visão geral</strong></div>
+                    <span class="demo-badge">Demonstração</span>
+                </header>
+                <main id="conteudo" tabindex="-1">
+                    <div class="page-heading">
+                        <div>
+                            <h1 id="titulo-pagina">Meu cultivo</h1>
+                            <p id="subtitulo-pagina">Acompanhe suas plantas e as condições do cultivo.</p>
+                        </div>
+                        <button class="button button-primary" data-cadastrar><svg class="icon"><use href="#icon-plus"/></svg>Cadastrar planta</button>
+                    </div>
+                    <div class="demo-note">
+                        <svg class="icon"><use href="#icon-info"/></svg>
+                        <p>Dados simulados. Recarregar a página restaura os cadastros de exemplo.</p>
+                    </div>
+                    <section id="pagina-inicio" aria-label="Visão geral do cultivo">
+                        <div class="section-toolbar">
+                            <div class="plant-picker"><label for="planta-selecionada">Planta</label><select id="planta-selecionada"></select></div>
+                            <button class="text-button" id="editar-planta"><svg class="icon"><use href="#icon-edit"/></svg>Editar planta</button>
+                        </div>
+                        <div id="cultivo-conteudo">
+                            <div id="dashboard-cultivo-placeholder" data-dashboard-component></div>
+                            <div id="dashboard-indicadores-placeholder" data-dashboard-component></div>
+                            <div id="dashboard-historico-placeholder" data-dashboard-component></div>
+                        </div>
+                        <div id="cultivo-vazio" class="empty-state" hidden>
+                            <svg class="icon"><use href="#icon-leaf"/></svg>
+                            <h2>Nenhuma planta cadastrada</h2>
+                            <p>Cadastre uma planta para explorar os indicadores de exemplo.</p>
+                            <button class="button button-primary" data-cadastrar>Cadastrar minha primeira planta</button>
+                        </div>
+                    </section>
+                    <section id="pagina-plantas" aria-label="Minhas plantas" hidden>
+                        <div id="dashboard-plantas-placeholder" data-dashboard-component></div>
+                    </section>
+                    <footer class="main-footer">
+                        <span>Greenduino</span>
+                        <span>Prévia sem conexão com sensores</span>
+                    </footer>
+                </main>
+            </div>
+        </div>
+        <div id="dashboard-modais-placeholder" data-dashboard-component></div>
+        <div id="mensagem" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+        <noscript><p class="noscript">Ative o JavaScript para explorar o dashboard e cadastrar plantas nesta demonstração.</p></noscript>
+        <script src="/utils/loadComponents.js"></script>
+        <script src="/components/dashboard/dashboard.js"></script>
+    </body>
+</html>

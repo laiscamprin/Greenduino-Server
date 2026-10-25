@@ -1,0 +1,564 @@
+@import url('/css/variables.css');
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@400..700&display=swap');
+@import url('/components/dashboard/menu/menu.css');
+@import url('/components/dashboard/cultivo/cultivo.css');
+@import url('/components/dashboard/indicadores/indicadores.css');
+@import url('/components/dashboard/historico/historico.css');
+@import url('/components/dashboard/plantas/plantas.css');
+@import url('/components/dashboard/modais/modais.css');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.dashboard-page {
+    --bg-base: #0b120f;
+    --text-muted: #a1b2a7;
+    --border-panel: #29362e;
+    background: var(--bg-base);
+    color: var(--text-main);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button, a, input, select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button, select {
+    cursor: pointer;
+}
+
+button {
+    color: inherit;
+}
+
+button, a, select, input {
+    touch-action: manipulation;
+}
+
+button {
+    border: 0;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+a {
+    color: inherit;
+}
+
+button, input, select {
+    border-radius: 9px;
+}
+
+:focus-visible {
+    outline: 2px solid #9fedc5;
+    outline-offset: 4px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+h1, h2, h3, p {
+    margin: 0;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+.icon {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.65;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.icon-library, .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+.skip-link {
+    position: fixed;
+    top: -80px;
+    left: 20px;
+    z-index: 10;
+    padding: 12px 20px;
+    color: var(--bg-base);
+    background: var(--green-primary);
+    border-radius: 8px;
+}
+
+.skip-link:focus {
+    top: 12px;
+}
+
+.dashboard-shell {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.workspace {
+    min-width: 0;
+}
+
+.topbar {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border-panel);
+    font-size: 12px;
+}
+
+.breadcrumb {
+    color: var(--text-muted);
+}
+
+.breadcrumb span {
+    margin: 0 12px;
+    color: #5f7767;
+}
+
+.breadcrumb strong {
+    color: #d1dfd5;
+    font-weight: 500;
+}
+
+.demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+main {
+    max-width: 1510px;
+    margin: auto;
+    padding: 32px 40px 0;
+}
+
+.page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+h1 {
+    font-size: clamp(26px, 2.4vw, 32px);
+    letter-spacing: -.6px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0 0 8px;
+}
+
+.page-heading p:last-child, .section-toolbar p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 11px 18px;
+    font-weight: 600;
+    font-size: 12px;
+    transition: background .15s;
+}
+
+.button-primary {
+    color: #042318;
+    background: var(--green-primary);
+}
+
+.button-primary:hover {
+    background: #38d6a2;
+}
+
+.page-heading>.button {
+    flex-shrink: 0;
+}
+
+.button-secondary {
+    background: #1b3023;
+    border: 1px solid #375640;
+}
+
+.button-secondary:hover {
+    background: #2c4434;
+}
+
+.button-danger {
+    background: #ef9c95;
+    color: #36100d;
+}
+
+.button-danger:hover {
+    background: #ffc5bd;
+}
+
+.text-button {
+    background: transparent;
+    color: #a9dfbb;
+    padding: 5px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    min-height: 36px;
+}
+
+.text-button:hover {
+    color: #dcffe9;
+    text-decoration: underline;
+}
+
+.demo-note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #a9bcb0;
+    padding: 0 0 20px;
+    border-bottom: 1px solid var(--border-panel);
+    font-size: 12px;
+}
+
+.demo-note .icon {
+    width: 16px;
+    height: 16px;
+}
+
+.section-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 25px 0 16px;
+}
+
+.plant-picker {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.plant-picker label {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+select {
+    color-scheme: dark;
+    background: #102219;
+    color: #e3eee6;
+    border: 1px solid #304737;
+    padding: 9px 30px 9px 12px;
+    min-height: 40px;
+    max-width: 100%;
+}
+
+.plant-picker select {
+    font-weight: 600;
+    width: 230px;
+}
+
+.cultivation-panel, .history-panel, .metric-card, .plant-card {
+    border: 1px solid var(--border-panel);
+    background: #111e16;
+    border-radius: 10px;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 5px;
+    border-radius: 5px;
+    padding: 4px 9px;
+    font-size: 10px;
+    background: #21382a;
+    color: #b1d8be;
+}
+
+.status-pill .icon {
+    width: 13px;
+    height: 13px;
+}
+
+.status-pill.attention {
+    color: #f4d799;
+    background: #3b301c;
+}
+
+.metrics-heading {
+    margin-top: 27px;
+}
+
+.metrics-heading h2 {
+    font-size: 18px;
+}
+
+.segmented {
+    display: flex;
+    padding: 3px;
+    background: #0c1c13;
+    border: 1px solid #2a4032;
+    border-radius: 8px;
+    gap: 3px;
+}
+
+.segmented button {
+    width: 36px;
+    min-height: 34px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: #91a99a;
+    border-radius: 5px;
+}
+
+.segmented button[aria-pressed=true] {
+    background: #284334;
+    color: #b8edcb;
+}
+
+.segmented .icon {
+    width: 17px;
+    height: 17px;
+}
+
+.main-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid #213629;
+    padding: 21px 0;
+    margin-top: 30px;
+    font-size: 9px;
+    color: #8da395;
+}
+
+.main-footer span span {
+    padding: 0 7px;
+}
+
+.icon-button {
+    display: inline-grid;
+    place-items: center;
+    min-width: 40px;
+    min-height: 40px;
+    color: #c2d8c9;
+    background: transparent;
+}
+
+.icon-button:hover {
+    background: #2c4434;
+}
+
+.icon-button.danger {
+    color: #f2b6ae;
+}
+
+.empty-state {
+    grid-column: 1/-1;
+    border: 1px dashed #46664f;
+    border-radius: 16px;
+    padding: 60px 20px;
+    text-align: center;
+    background: #0d2015;
+}
+
+.empty-state>.icon {
+    width: 46px;
+    height: 46px;
+    color: var(--green-primary);
+    margin-bottom: 18px;
+}
+
+.empty-state p {
+    margin: 12px 0 24px;
+    color: var(--text-muted);
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    max-width: min(480px, calc(100% - 32px));
+    background: #d4f8df;
+    color: #123321;
+    border: 1px solid #8acfaa;
+    padding: 13px 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 50px #0007;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.toast:empty {
+    display: none;
+}
+
+.noscript {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+    background: #50381a;
+    color: #fff;
+    text-align: center;
+}
+
+@media (max-width: 1180px) {
+    .dashboard-shell {
+        grid-template-columns: 200px minmax(0, 1fr);
+    }
+
+    main {
+        padding: 28px 24px 0;
+    }
+
+    .topbar {
+        padding-inline: 24px;
+    }
+
+    .plant-picker label {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard-shell {
+        display: block;
+    }
+
+    .topbar {
+        height: 58px;
+    }
+
+    .page-heading {
+        gap: 15px;
+    }
+}
+
+@media (max-width: 620px) {
+    .topbar {
+        padding-inline: 16px;
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    .breadcrumb span {
+        margin: 0 5px;
+    }
+
+    .demo-badge {
+        font-size: 9px;
+        padding: 5px 8px;
+    }
+
+    main {
+        padding: 24px 16px 0;
+    }
+
+    .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-heading>.button {
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    .page-heading p:last-child {
+        max-width: 36ch;
+    }
+
+    .demo-note {
+        align-items: flex-start;
+        font-size: 10px;
+    }
+
+    .status-pill {
+        font-size: 9px;
+    }
+
+    .metrics-heading h2 {
+        font-size: 18px;
+    }
+
+    .section-toolbar p {
+        font-size: 11px;
+    }
+
+    .plant-picker select {
+        width: min(210px, 51vw);
+        font-size: 12px;
+    }
+
+    .section-toolbar {
+        gap: 8px;
+    }
+
+    .main-footer {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+#dashboard-loading {
+    margin: 32px;
+    color: var(--text-muted);
+}

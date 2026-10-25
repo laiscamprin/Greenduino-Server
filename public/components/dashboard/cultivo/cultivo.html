@@ -1,0 +1,35 @@
+<div class="overview-grid">
+    <section class="cultivation-panel" aria-labelledby="titulo-cultivo">
+        <div class="panel-top">
+            <h2 id="titulo-cultivo">Visão do cultivo</h2>
+            <span class="status-pill" id="estado-cultivo"></span>
+        </div>
+        <div class="scene">
+            <img src="/assets/images/estufa-dashboard.svg" alt="Ilustração de uma estufa conectada, com fileiras de plantas, sensores e reservatório de água." width="720" height="440">
+            <svg class="scene-connections" aria-hidden="true"><path id="linha-solo"/><path id="linha-ambiente"/></svg>
+            <div class="scene-label scene-label-soil"><svg class="icon"><use href="#icon-drop"/></svg><span>Solo <strong id="cena-umidade"></strong></span></div>
+            <div class="scene-label scene-label-air">
+                <svg class="icon"><use href="#icon-temp"/></svg>
+                <span>Ambiente <strong id="cena-temperatura"></strong></span>
+            </div>
+        </div>
+        <div class="cultivation-footer">
+            <span class="device-icon"><svg class="icon"><use href="#icon-chip"/></svg></span>
+            <div><strong id="dispositivo-nome"></strong><small>Última leitura do exemplo às 14:00</small></div>
+        </div>
+    </section>
+    <aside class="care-panel" aria-labelledby="titulo-cuidados">
+        <h2 id="titulo-cuidados"></h2>
+        <p id="resumo-cultivo"></p>
+        <div class="care-divider"></div>
+        <div class="care-detail">
+            <span class="mini-icon"><svg class="icon"><use href="#icon-drop"/></svg></span>
+            <div><strong id="estado-bomba"></strong><p id="descricao-bomba"></p></div>
+        </div>
+        <div class="care-detail">
+            <span class="mini-icon"><svg class="icon"><use href="#icon-leaf"/></svg></span>
+            <div><strong id="nome-especie"></strong><p id="nome-cientifico"></p></div>
+        </div>
+        <button class="text-button" data-ajuda>Entenda os indicadores <svg class="icon"><use href="#icon-arrow"/></svg></button>
+    </aside>
+</div>

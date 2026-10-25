@@ -1,0 +1,149 @@
+.brand {
+    font-family: 'Jura', 'Segoe UI', sans-serif;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 36px 20px 24px;
+    border-right: 1px solid var(--border-panel);
+    background: #0d1711;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    min-height: 630px;
+}
+
+.brand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 23px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: -.8px;
+}
+
+.brand img {
+    border-radius: 10px;
+    padding: 4px;
+    background: #fff;
+}
+
+.brand span span {
+    color: var(--green-primary);
+}
+
+nav {
+    display: grid;
+    gap: 8px;
+    margin-top: 40px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    width: 100%;
+    background: transparent;
+    color: #b0bfb5;
+    text-align: left;
+}
+
+.nav-item:hover {
+    background: #12291b;
+}
+
+.nav-item.is-active {
+    color: #c9e5d4;
+    background: #1d3025;
+}
+
+.nav-count {
+    margin-left: auto;
+    padding: 0 6px;
+    border: 1px solid #34523e;
+    border-radius: 5px;
+    font-size: 11px;
+}
+
+.sidebar-help {
+    margin-top: auto;
+    padding: 20px 10px 0;
+    border-top: 1px solid var(--border-panel);
+}
+
+.sidebar-help .text-button {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+    .sidebar {
+        padding-inline: 14px;
+    }
+
+    .brand {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        position: static;
+        height: auto;
+        min-height: 0;
+        padding: 18px 24px;
+        border-right: 0;
+        border-bottom: 1px solid var(--border-panel);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .sidebar nav {
+        display: flex;
+        margin-top: 0;
+    }
+
+    .nav-item {
+        width: auto;
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    .sidebar-help {
+        display: none;
+    }
+}
+
+@media (max-width: 620px) {
+    .sidebar {
+        padding: 18px 16px 12px;
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    .brand {
+        font-size: 23px;
+    }
+
+    .sidebar nav {
+        width: 100%;
+    }
+
+    .nav-item {
+        flex: 1;
+        justify-content: center;
+        gap: 8px;
+        padding-inline: 8px;
+    }
+
+    .nav-count {
+        margin-left: 0;
+    }
+}

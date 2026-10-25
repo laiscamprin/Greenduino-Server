@@ -9,7 +9,9 @@ const autenticacao = (req, res, next) => {
     next();
 };
 
-router.get('/dashboard', autenticacao, dashboardController.renderDashboard);
+router.get('/', (req, res) => {
+    res.render('dashboard/index');
+});
 router.get('/api/dashboard/dados', autenticacao, dashboardController.consultaDados);
 
 module.exports = router;

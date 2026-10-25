@@ -1,0 +1,21 @@
+<section class="history-panel" aria-labelledby="titulo-historico">
+    <div class="history-heading">
+        <h2 id="titulo-historico">Histórico de umidade do solo</h2>
+        <div class="history-controls">
+            <label class="sr-only" for="periodo">Período do histórico</label>
+            <select id="periodo">
+                <option value="hoje">Hoje</option>
+                <option value="semana">Últimos 7 dias</option>
+                <option value="mes">Últimos 30 dias</option>
+            </select>
+            <label class="sr-only" for="visualizacao">Formato do histórico</label>
+            <select id="visualizacao"><option value="linha">Linhas</option><option value="barras">Barras</option><option value="tabela">Tabela</option></select>
+        </div>
+    </div>
+    <div class="chart-legend">
+        <span><i></i><span id="legenda-metrica">Umidade do solo</span></span>
+        <span class="range-legend"><i></i>Faixa de referência do exemplo</span>
+    </div>
+    <div id="grafico" class="chart-container"></div>
+    <p id="resumo-historico" class="chart-summary"></p>
+</section>

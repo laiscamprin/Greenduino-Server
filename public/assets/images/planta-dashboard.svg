@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 250" fill="none">
+  <defs>
+    <linearGradient id="folha" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c8e691"/><stop offset=".5" stop-color="#6fb878"/><stop offset="1" stop-color="#258567"/></linearGradient>
+    <linearGradient id="vaso" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#a5b99a"/><stop offset=".45" stop-color="#e3e6c7"/><stop offset="1" stop-color="#809e81"/></linearGradient>
+  </defs>
+  <ellipse cx="121" cy="229" rx="65" ry="9" fill="#071d10" opacity=".4"/>
+  <path d="M78 163h86l-12 54q-31 18-62 0Z" fill="url(#vaso)"/>
+  <ellipse cx="121" cy="164" rx="43" ry="13" fill="#d6dfbb"/><ellipse cx="121" cy="165" rx="36" ry="9" fill="#3d4230"/>
+  <path d="M121 166c-1-54-2-80 7-123M123 147 81 94m41 47 49-61m-50 28-24-56m26 110 38-35m-41 23-52-22" stroke="#7eab6c" stroke-width="4" stroke-linecap="round"/>
+  <path d="M125 85c-29-27-23-52 9-70 20 35 15 57-9 70Z" fill="url(#folha)"/>
+  <path d="M99 83c-39 6-60-12-59-49 40 5 60 18 59 49Z" fill="url(#folha)"/>
+  <path d="M111 123c-43 5-67-15-70-49 43-1 68 14 70 49Z" fill="url(#folha)"/>
+  <path d="M133 114c-5-44 19-68 62-69-1 46-23 69-62 69Z" fill="url(#folha)"/>
+  <path d="M140 148c0-32 24-48 65-39-12 34-33 46-65 39Z" fill="url(#folha)"/>
+  <path d="M104 151c-36 7-60-4-76-32 34-13 63-5 76 32Z" fill="url(#folha)"/>
+  <path d="m126 83 7-54m-36 52L51 43m59 78L52 84m83 27 50-54m-42 88 50-28m-91 33-61-26" stroke="#e0f0b8" stroke-opacity=".5" stroke-width="1.5"/>
+</svg>
