@@ -3,18 +3,16 @@ const greenduinoBanco = require('../config/greenduinoBanco')();
 
 module.exports = {
 
-    renderDispositivos: async function(req, res, next) {
-       var connection = await connectionFactory();
+    renderDispositivos: function(req, res, next) {
+        const connection = connectionFactory();
         const id_usuario = req.session.usuario.id;
 
         greenduinoBanco.listarEstufas(id_usuario, connection, function(err, estufas) {
-
             if (err) {
                 console.error('Erro ao listar estufas no painel:', err);
                 return next(err);
             }
 
-         
             res.render('dispositivos/index', {
                 usuario: req.session.usuario,
                 estufas: estufas
@@ -22,24 +20,23 @@ module.exports = {
         });
     },
 
-    
     renderCadastro: function(req, res, next) {
         const connection = connectionFactory();
 
         greenduinoBanco.listarEspecies(connection, function(err, especies) {
-            connection.end();
-
             if (err) {
                 return next(err);
             }
 
-            res.render('dispositivo/cadastrarEstufa', {
+            // Antes renderizava 'dispositivo/cadastrarEstufa' (singular), mas
+            // a pasta de views é 'dispositivos/' (plural) - dava erro
+            // "Failed to lookup view" sempre que essa tela era aberta.
+            res.render('dispositivos/cadastrarEstufa', {
                 usuario: req.session.usuario,
                 especies: especies
             });
         });
     },
-
 
     renderEdicao: function(req, res, next) {
         const { id_estufa } = req.params;
@@ -47,13 +44,14 @@ module.exports = {
 
         greenduinoBanco.buscarEstufaPorId(id_estufa, connection, function(err, estufaResult) {
             if (err) {
-                connection.end();
                 return next(err);
             }
 
-            greenduinoBanco.listarEspecies(connection, function(errEsp, especies) {
-                connection.end();
+            if (estufaResult.length === 0 || estufaResult[0].id_usuario !== req.session.usuario.id) {
+                return res.status(404).render('erros/404');
+            }
 
+            greenduinoBanco.listarEspecies(connection, function(errEsp, especies) {
                 if (errEsp) return next(errEsp);
 
                 res.render('dispositivos/editarEstufa', {

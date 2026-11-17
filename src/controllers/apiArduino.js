@@ -1,5 +1,6 @@
 const connectionFactory = require('../config/connectionFactory');
 const greenduinoBanco = require('../config/greenduinoBanco')();
+const { calcularTempoIrrigacaoMs } = require('../services/irrigacaoService');
 
 module.exports = {
 
@@ -14,12 +15,10 @@ module.exports = {
 
         greenduinoBanco.idEstufa(token_estufa, connection, function(err, results) {
             if (err) {
-                connection.release();
                 return response.status(500).json({ erro: 'Erro ao validar token da estufa.' });
             }
 
             if (results.length === 0) {
-              connection.release();
                 return response.status(404).json({ erro: 'Estufa não encontrada com o token informado.' });
             }
 
@@ -30,12 +29,10 @@ module.exports = {
                 temperatura_ar: temperatura_ar,
                 umidade_ar: umidade_ar,
                 umidade_solo: umidade_solo,
-                bomba_acionada: bomba_acionada ? 1 : 0, 
+                bomba_acionada: bomba_acionada ? 1 : 0,
             };
 
             greenduinoBanco.insertTelemetria(dadosInsert, connection, function(err) {
-           connection.release();
-
                 if (err) {
                     console.error('Erro ao salvar no banco:', err);
                     return response.status(500).json({ erro: 'Erro ao salvar dados de telemetria.' });
@@ -56,7 +53,6 @@ module.exports = {
         const connection = connectionFactory();
 
         greenduinoBanco.envioParametros(token_estufa, connection, function(err, results) {
-            connection.release();
             if (err) {
                 console.error('Erro ao buscar configurações:', err);
                 return response.status(500).json({ erro: 'Erro interno do servidor.' });
@@ -66,7 +62,27 @@ module.exports = {
                 return response.status(404).json({ erro: 'Estufa não encontrada ou sem espécie atrelada.' });
             }
 
-            return response.status(200).json(results[0]);
+            const linha = results[0];
+
+            // O tempo de irrigação é calculado aqui, na hora, a partir da
+            // espécie + tamanho do vaso + vazão da bomba cadastrados -
+            // nunca fica "parado" num valor antigo no banco.
+            const tempoIrrigacaoMs = calcularTempoIrrigacaoMs({
+                umidade_minima: linha.umidade_minima,
+                umidade_ideal: linha.umidade_ideal,
+                tamanho_vaso: linha.tamanho_vaso,
+                vazao_bomba_ml_s: linha.vazao_bomba_ml_s
+            });
+
+            // Chaves alinhadas com o que o firmware (config_rede.h) espera:
+            // doc["umidade_minima"] e doc["tempo_irrigacao_ms"]. Antes o
+            // backend mandava "tempo_irrigacao" (sem "_ms"), que não batia
+            // com o que o Arduino lia - então tempoIrrigacao chegava sempre
+            // como 0 no receptor e a bomba nunca era acionada.
+            return response.status(200).json({
+                umidade_minima: linha.umidade_minima,
+                tempo_irrigacao_ms: tempoIrrigacaoMs
+            });
         });
     }
 };

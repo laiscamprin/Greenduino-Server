@@ -4,11 +4,15 @@ const greenduinoBanco = require('../config/greenduinoBanco')();
 module.exports = {
 
     cadastrarEspecie: function(req, res) {
-        const { nome_especie, nome_cientifico, temperatura_minima, umidade_minima } = req.body;
+        const {
+            nome_especie, nome_cientifico,
+            temperatura_minima, temperatura_ideal, temperatura_maxima,
+            umidade_minima, umidade_ideal, umidade_maxima
+        } = req.body;
 
         if (!nome_especie || !nome_cientifico) {
-            return res.status(400).json({ 
-                erro: 'Nome da espécie e nome científico são obrigatórios.' 
+            return res.status(400).json({
+                erro: 'Nome da espécie e nome científico são obrigatórios.'
             });
         }
 
@@ -16,14 +20,18 @@ module.exports = {
             nome_especie,
             nome_cientifico,
             temperatura_minima: temperatura_minima || null,
-            umidade_minima: umidade_minima || null
+            temperatura_ideal: temperatura_ideal || null,
+            temperatura_maxima: temperatura_maxima || null,
+            // umidade_* aqui é umidade do SOLO (é o que o higrômetro mede e
+            // o que o Arduino usa como gatilho/alvo de irrigação).
+            umidade_minima: umidade_minima || null,
+            umidade_ideal: umidade_ideal || null,
+            umidade_maxima: umidade_maxima || null
         };
 
         const connection = connectionFactory();
 
         greenduinoBanco.cadastrarEspecie(especie, connection, function(err, result) {
-            connection.release();
-
             if (err) {
                 console.error('Erro ao cadastrar espécie:', err);
                 return res.status(500).json({ erro: 'Erro interno ao cadastrar espécie.' });
@@ -40,8 +48,6 @@ module.exports = {
         const connection = connectionFactory();
 
         greenduinoBanco.listarEspecies(connection, function(err, results) {
-            connection.release();
-
             if (err) {
                 console.error('Erro ao listar espécies:', err);
                 return res.status(500).json({ erro: 'Erro interno ao listar espécies.' });
@@ -56,8 +62,6 @@ module.exports = {
         const connection = connectionFactory();
 
         greenduinoBanco.buscarEspeciePorId(id_especie, connection, function(err, results) {
-            connection.release();
-
             if (err) {
                 console.error('Erro ao buscar espécie:', err);
                 return res.status(500).json({ erro: 'Erro ao buscar detalhes da espécie.' });
@@ -77,8 +81,6 @@ module.exports = {
         const connection = connectionFactory();
 
         greenduinoBanco.alterarEspecie(id_especie, dadosAtualizados, connection, function(err, result) {
-            connection.release();
-
             if (err) {
                 console.error('Erro ao atualizar espécie:', err);
                 return res.status(500).json({ erro: 'Erro interno ao atualizar espécie.' });
@@ -93,12 +95,10 @@ module.exports = {
         const connection = connectionFactory();
 
         greenduinoBanco.excluirEspecie(id_especie, connection, function(err, result) {
-            connection.release();
-
             if (err) {
                 console.error('Erro ao excluir espécie:', err);
-                return res.status(500).json({ 
-                    erro: 'Erro ao excluir espécie. Verifique se ela não está associada a nenhuma estufa.' 
+                return res.status(500).json({
+                    erro: 'Erro ao excluir espécie. Verifique se ela não está associada a nenhuma estufa.'
                 });
             }
 

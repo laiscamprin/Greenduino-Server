@@ -10,7 +10,19 @@ module.exports = function() {
     };
 
     this.envioParametros = function(tokenEstufa, connection, callback) {
-        const sql = 'SELECT ep.umidade_minima, e.tempo_irrigacao FROM estufas e INNER JOIN especies ep ON e.id_especie = ep.id_especie WHERE e.token_estufa = ?';
+        // Traz tudo que o irrigacaoService precisa pra calcular o tempo de
+        // irrigação na hora: a faixa de umidade da espécie e o vaso/vazão
+        // específicos dessa estufa.
+        const sql = `
+            SELECT
+                ep.umidade_minima,
+                ep.umidade_ideal,
+                e.tamanho_vaso,
+                e.vazao_bomba_ml_s
+            FROM estufas e
+            INNER JOIN especies ep ON e.id_especie = ep.id_especie
+            WHERE e.token_estufa = ?
+        `;
         connection.query(sql, tokenEstufa, callback);
     };
 

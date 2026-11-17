@@ -33,18 +33,16 @@ module.exports = {
                 });
             }
 
-            var connection = await connectionFactory();
+            var connection = connectionFactory();
 
-            console.log("dps do connection foi");
             usuariosBanco.buscaPorEmail(usuario.email, connection, function(err, results) {
-                 console.log("chegou no banco");
                 if (err) {
                     console.error("ERRO NO buscaPorEmail:", err);
                     return next(err);
                 }
 
                 if (results.length > 0) {
-                
+
                     return res.status(400).render('autenticacao/cadastro', {
                         errosValidacao: { email: { msg: 'Este e-mail já está cadastrado!' } },
                         usuario: usuario
@@ -52,10 +50,8 @@ module.exports = {
                 }
 
                 delete usuario.confirmarSenha;
-        
+
                 usuariosBanco.salva(usuario, connection, function(err, results) {
-                    console.log("até aqui foi");
-    
                     if (err) return next(err);
                     res.redirect('/usuario/login');
                 });
@@ -67,20 +63,20 @@ module.exports = {
         res.render('autenticacao/login', { erro: null });
     },
 
-    login: async function(req, res, next) {
+    login: function(req, res, next) {
         var email = req.body.email;
         var senha = req.body.senha;
 
         const agora = Date.now();
-        const tempoBloqueio = 1 * 60 * 1000; 
+        const tempoBloqueio = 1 * 60 * 1000;
 
         if (req.session.tentativasLogin && agora < req.session.tentativasLogin) {
             const segundosRestantes = Math.ceil((req.session.tentativasLogin - agora) / 1000);
             const min = Math.floor(segundosRestantes / 60);
             const seg = segundosRestantes % 60;
 
-            return res.render('autenticacao/login', { 
-                erro: `Seu acesso foi bloqueado devido a várias tentativas. Tente novamente em ${min}m ${seg}s.` 
+            return res.render('autenticacao/login', {
+                erro: `Seu acesso foi bloqueado devido a várias tentativas. Tente novamente em ${min}m ${seg}s.`
             });
         }
 
@@ -89,7 +85,7 @@ module.exports = {
             req.session.tentativas = 0;
         }
 
-         var connection = await connectionFactory();
+        var connection = connectionFactory();
 
         usuariosBanco.buscaPorEmail(email, connection, function(err, results) {
             if (err) {
@@ -136,11 +132,11 @@ module.exports = {
         if (!req.session.usuario) {
             return res.redirect('/login');
         }
-        res.render('autenticacao/meu-perfil', { 
-            usuario: req.session.usuario, 
-            erroSenha: null, 
-            erroNome: null, 
-            errosValidacao: {} 
+        res.render('autenticacao/meu-perfil', {
+            usuario: req.session.usuario,
+            erroSenha: null,
+            erroNome: null,
+            errosValidacao: {}
         });
     },
 
@@ -151,11 +147,11 @@ module.exports = {
         function(req, res, next) {
             const erroPerfil = validationResult(req);
             if (!erroPerfil.isEmpty()) {
-                return res.render('autenticacao/meu-perfil', { 
-                    erroNome: null, 
-                    erroSenha: null, 
-                    usuario: req.session.usuario, 
-                    errosValidacao: erroPerfil.mapped() 
+                return res.render('autenticacao/meu-perfil', {
+                    erroNome: null,
+                    erroSenha: null,
+                    usuario: req.session.usuario,
+                    errosValidacao: erroPerfil.mapped()
                 });
             }
 
@@ -167,17 +163,15 @@ module.exports = {
 
             usuariosBanco.verificarSenha(id, connection, function(err, results) {
                 if (err) {
-                    connection.end();
                     return res.status(500).send("Erro ao verificar senha.");
                 }
 
                 if (results.length === 0) {
-                    connection.end();
-                    return res.render('autenticacao/meu-perfil', { 
-                        erroNome: 'Usuário não encontrado.', 
-                        erroSenha: null, 
-                        usuario: req.session.usuario, 
-                        errosValidacao: {} 
+                    return res.render('autenticacao/meu-perfil', {
+                        erroNome: 'Usuário não encontrado.',
+                        erroSenha: null,
+                        usuario: req.session.usuario,
+                        errosValidacao: {}
                     });
                 }
 
@@ -185,18 +179,16 @@ module.exports = {
                 const senhaValidada = bcrypt.compareSync(senha, senhaEncontrada.senha);
 
                 if (!senhaValidada) {
-                    connection.end();
-                    return res.render('autenticacao/meu-perfil', { 
-                        erroNome: 'Senha atual incorreta.', 
-                        erroSenha: null, 
-                        usuario: req.session.usuario, 
-                        errosValidacao: {} 
+                    return res.render('autenticacao/meu-perfil', {
+                        erroNome: 'Senha atual incorreta.',
+                        erroSenha: null,
+                        usuario: req.session.usuario,
+                        errosValidacao: {}
                     });
                 }
 
                 const dados = { nome: nome, id: id };
                 usuariosBanco.alterarNome(dados, connection, function(err, results) {
-                    connection.end();
                     if (err) {
                         return res.status(500).send("Erro ao alterar nome no banco: " + err);
                     }
@@ -213,11 +205,11 @@ module.exports = {
         if (!req.session.usuario) {
             return res.redirect('/login');
         }
-        res.render('autenticacao/meu-perfil', { 
-            usuario: req.session.usuario, 
-            erroSenha: null, 
-            erroNome: null, 
-            errosValidacao: {} 
+        res.render('autenticacao/meu-perfil', {
+            usuario: req.session.usuario,
+            erroSenha: null,
+            erroNome: null,
+            errosValidacao: {}
         });
     },
 
@@ -234,46 +226,43 @@ module.exports = {
         function(req, res, next) {
             const erroSenha = validationResult(req);
             if (!erroSenha.isEmpty()) {
-                return res.render('autenticacao/meu-perfil', { 
-                    erroSenha: null, 
-                    erroNome: null, 
-                    usuario: req.session.usuario, 
-                    errosValidacao: erroSenha.mapped() 
+                return res.render('autenticacao/meu-perfil', {
+                    erroSenha: null,
+                    erroNome: null,
+                    usuario: req.session.usuario,
+                    errosValidacao: erroSenha.mapped()
                 });
             }
 
             const senha = req.body.senha;
             const id = req.session.usuario.id;
-            const senhaNova = req.body.senhaNova; 
+            const senhaNova = req.body.senhaNova;
 
             const connection = connectionFactory();
 
             usuariosBanco.verificarSenha(id, connection, function(err, results) {
                 if (err) {
-                    connection.end();
                     return res.status(500).send("Erro ao verificar senha.");
                 }
 
                 if (results.length === 0) {
-                    connection.end();
-                    return res.render('autenticacao/meu-perfil', { 
-                        erroSenha: 'Usuário não encontrado', 
-                        erroNome: null, 
-                        usuario: req.session.usuario, 
-                        errosValidacao: {} 
+                    return res.render('autenticacao/meu-perfil', {
+                        erroSenha: 'Usuário não encontrado',
+                        erroNome: null,
+                        usuario: req.session.usuario,
+                        errosValidacao: {}
                     });
                 }
 
                 const senhaEncontrada = results[0];
-            
+                const senhaValidada = bcrypt.compareSync(senha, senhaEncontrada.senha);
 
                 if (!senhaValidada) {
-                    connection.end();
-                    return res.render('autenticacao/meu-perfil', { 
-                        erroSenha: 'Senha atual está incorreta', 
-                        erroNome: null, 
-                        usuario: req.session.usuario, 
-                        errosValidacao: {} 
+                    return res.render('autenticacao/meu-perfil', {
+                        erroSenha: 'Senha atual está incorreta',
+                        erroNome: null,
+                        usuario: req.session.usuario,
+                        errosValidacao: {}
                     });
                 }
 
@@ -282,11 +271,10 @@ module.exports = {
 
                 const dados = { senhaNova: senhaHash, id: id };
                 usuariosBanco.alterarSenha(dados, connection, function(err, results) {
-                    connection.end();
                     if (err) {
                         return res.status(500).send("Erro ao atualizar senha no banco: " + err);
                     }
-                    
+
                     res.redirect('/perfil');
                 });
             });

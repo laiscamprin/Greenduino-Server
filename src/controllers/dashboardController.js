@@ -1,45 +1,35 @@
 const connectionFactory = require('../config/connectionFactory');
-const { check, validationResult } = require('express-validator');
 const dashboardBanco = require('../config/dashboardBanco')();
 
-module.exports ={
-    
-    renderDashboard: function(req, res, next) {
-        if (!req.session.usuario) {
-            return res.redirect('/login');
-        }
-        const connection = connectionFactory();
-        const idEstufa = req.session.usuario.id_estufa; // descobrir como achar isso??. por meio de adicionar a estufa na sessão quando cadastra-lá, mas precisa pegar a estufa ao clicar nela?
-        // então provavelmente não vai ser assim, mas o get da url, de uma maneira protegida para não acessar outras estufas
-        // criptografar o id da estufa???
+module.exports = {
 
-        //informações assim que abrir a página
-        dadosBanco.dadosAtual(idEstufa, connection, function(err, results) {
-            connection.end();
+    // req.estufa já vem carregado e com o dono conferido pelo middleware
+    // autorizacaoEstufa (ver src/routes/dashboard.js), então aqui já
+    // podemos confiar no id_estufa.
+    renderDashboard: function(req, res, next) {
+        const connection = connectionFactory();
+        const idEstufa = req.estufa.id_estufa;
+
+        // Informações assim que abrir a página.
+        dashboardBanco.dadosAtual(idEstufa, connection, function(err, results) {
             if (err) return next(err);
 
             res.render('dashboard/index', {
                 usuario: req.session.usuario,
+                estufa: req.estufa,
                 dadosAtuais: results[0] || {}
             });
         });
     },
 
     consultaDados: function(req, res, next) {
-        if (!req.session.usuario) {
-             return res.redirect('/login');
-        }
-
         const connection = connectionFactory();
-        const idEstufa = req.session.usuario.id_estufa;
-        
+        const idEstufa = req.estufa.id_estufa;
 
         const periodo = req.query.periodo || 'hoje';
         const parametro = req.query.parametro || 'todos';
 
-        dadosBanco.dadosGrafico(idEstufa, periodo, connection, function(err, resultados) {
-            connection.end();
-
+        dashboardBanco.dadosGrafico(idEstufa, periodo, connection, function(err, resultados) {
             if (err) {
                 return res.status(500).json({ erro: 'Erro ao consultar os dados no banco: ' + err });
             }
@@ -58,4 +48,3 @@ module.exports ={
         });
     }
 };
-
