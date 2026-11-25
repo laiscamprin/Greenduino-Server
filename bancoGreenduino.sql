@@ -13,15 +13,9 @@ CREATE TABLE usuarios (
     id_especie INT AUTO_INCREMENT PRIMARY KEY,
     nome_especie VARCHAR(255) NOT NULL,
     nome_cientifico VARCHAR(255) NOT NULL,
-    -- Faixa de temperatura do AR ideal para a espécie (usada hoje só para
-    -- exibir/alertar no dashboard).
     temperatura_minima DECIMAL(10,2),
     temperatura_ideal DECIMAL(10,2),
     temperatura_maxima DECIMAL(10,2),
-    -- Faixa de umidade do SOLO ideal para a espécie: umidade_minima é o
-    -- gatilho que dispara a irrigação (comparado à leitura do higrômetro),
-    -- umidade_ideal é o alvo que o cálculo de irrigação tenta atingir, e
-    -- umidade_maxima é usada para alertar excesso de água.
     umidade_minima DECIMAL(10,2),
     umidade_ideal DECIMAL(10,2),
     umidade_maxima DECIMAL(10,2)
@@ -32,14 +26,8 @@ CREATE TABLE estufas (
     nome_estufa VARCHAR(255) NOT NULL,
     id_usuario INT NOT NULL,
     id_especie INT NOT NULL,
-    -- Categoria do vaso (ver LITROS_POR_TAMANHO_VASO em irrigacaoService.js)
-    -- e vazão real da bomba instalada nessa estufa (mL por segundo) - os
-    -- dois entram no cálculo de quanto tempo irrigar.
     tamanho_vaso ENUM('P','M','G') NOT NULL DEFAULT 'M',
     vazao_bomba_ml_s DECIMAL(10,2),
-    -- Cache do último tempo de irrigação calculado, só para exibição rápida
-    -- (listagem/dashboard). O valor realmente usado para acionar a bomba é
-    -- sempre recalculado na hora em GET /api/parametros/:token_estufa.
     tempo_irrigacao DECIMAL(10,2),
     token_estufa VARCHAR(255) UNIQUE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
@@ -61,4 +49,4 @@ CREATE TABLE dados (
 
 SELECT*FROM usuarios;
 
-INSERT INTO usuarios (nome_usuario, email, telefone, senha) VALUES ('Lais','lais@lais.com', '11972424166', '1234');
+
