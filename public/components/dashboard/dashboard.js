@@ -10,27 +10,54 @@ document.addEventListener('componentsLoaded', function () {
     conteudo.hidden = false;
     carregamento.hidden = true;
 
-    // Dados locais de demonstração. Os campos mantêm os nomes usados nas estufas e leituras do projeto.
-    const especies = [
-        { id_especie: 1, nome_especie: 'Manjericão', nome_cientifico: 'Ocimum basilicum' },
-        { id_especie: 2, nome_especie: 'Hortelã', nome_cientifico: 'Mentha spicata' },
-        { id_especie: 3, nome_especie: 'Alecrim', nome_cientifico: 'Salvia rosmarinus' },
-        { id_especie: 4, nome_especie: 'Alface', nome_cientifico: 'Lactuca sativa' },
-        { id_especie: 5, nome_especie: 'Tomate', nome_cientifico: 'Solanum lycopersicum' }
-    ];
-    let plantas = [
-        { id_estufa: 1, nome_estufa: 'Manjericão da cozinha', id_especie: 1, token_estufa: 'DEMO-1', altura: 25, largura: 30, comprimento: 30, dadosAtuais: { umidade_solo: 62, temperatura_ar: 24, umidade_ar: 68, bomba_acionada: false } },
-        { id_estufa: 2, nome_estufa: 'Hortelã da varanda', id_especie: 2, token_estufa: 'DEMO-2', altura: 20, largura: 25, comprimento: 40, dadosAtuais: { umidade_solo: 32, temperatura_ar: 27, umidade_ar: 56, bomba_acionada: false } },
-        { id_estufa: 3, nome_estufa: 'Meu alecrim', id_especie: 3, token_estufa: 'DEMO-3', altura: 35, largura: 35, comprimento: 35, dadosAtuais: { umidade_solo: 57, temperatura_ar: 23, umidade_ar: 61, bomba_acionada: true } }
-    ];
-    // Faixas exclusivamente ilustrativas; não são limites agronômicos nem configurações do dispositivo.
-    const parametros = {
-        umidade_solo: { nome: 'Umidade do solo', unidade: '%', icone: 'drop', minimo: 40, maximo: 75, escala: 100, descricao: 'A umidade presente na terra' },
-        temperatura_ar: { nome: 'Temperatura do ar', unidade: '°C', icone: 'temp', minimo: 18, maximo: 30, escala: 40, descricao: 'A temperatura perto da planta' },
-        umidade_ar: { nome: 'Umidade do ar', unidade: '%', icone: 'air', minimo: 50, maximo: 80, escala: 100, descricao: 'A umidade presente no ambiente' }
-    };
-    let idEstufa = 1;
-    let proximoId = 4;
+    // Dados reais, vindos da sessão/servidor (window.GREENDUINO, definido em
+    // src/views/dashboard/index.ejs) e da API:
+    // GET /api/especies, GET /api/estufas/usuario/:id,
+    // GET /dashboard/:id/atual, GET /dashboard/:id/dados,
+    // POST|PUT|DELETE /api/estufas.
+    const GREENDUINO = window.GREENDUINO || { idUsuario: null, idEstufaInicial: null, dadosAtuaisIniciais: null };
+
+    let especies = [];
+    let plantas = [];
+
+    // Faixas de referência usadas enquanto a espécie não tiver uma faixa
+    // própria cadastrada (campos ainda null em "especies"). Não são limites
+    // agronômicos, só um ponto de partida visual.
+    const PADRAO_UMIDADE_SOLO = { minimo: 40, maximo: 75 };
+    const PADRAO_TEMPERATURA_AR = { minimo: 18, maximo: 30 };
+    // Ainda não existe uma faixa ideal de umidade do ar por espécie no banco
+    // (só solo e temperatura têm min/ideal/max) - fica fixa até existir.
+    const UMIDADE_AR = { minimo: 50, maximo: 80 };
+
+    function numeroOuPadrao(valor, padrao) {
+        const numero = Number(valor);
+        return Number.isFinite(numero) ? numero : padrao;
+    }
+
+    function obterParametros(especie) {
+        const e = especie || {};
+        return {
+            umidade_solo: {
+                nome: 'Umidade do solo', unidade: '%', icone: 'drop', escala: 100,
+                minimo: numeroOuPadrao(e.umidade_minima, PADRAO_UMIDADE_SOLO.minimo),
+                maximo: numeroOuPadrao(e.umidade_maxima, PADRAO_UMIDADE_SOLO.maximo),
+                descricao: 'A umidade presente na terra'
+            },
+            temperatura_ar: {
+                nome: 'Temperatura do ar', unidade: '°C', icone: 'temp', escala: 40,
+                minimo: numeroOuPadrao(e.temperatura_minima, PADRAO_TEMPERATURA_AR.minimo),
+                maximo: numeroOuPadrao(e.temperatura_maxima, PADRAO_TEMPERATURA_AR.maximo),
+                descricao: 'A temperatura perto da planta'
+            },
+            umidade_ar: {
+                nome: 'Umidade do ar', unidade: '%', icone: 'air', escala: 100,
+                minimo: UMIDADE_AR.minimo, maximo: UMIDADE_AR.maximo,
+                descricao: 'A umidade presente no ambiente'
+            }
+        };
+    }
+
+    let idEstufa = GREENDUINO.idEstufaInicial;
     let idExcluir = null;
     let parametro = 'umidade_solo';
     let pagina = 'inicio';
@@ -42,9 +69,9 @@ document.addEventListener('componentsLoaded', function () {
     const campoNome = document.getElementById('nome_estufa');
     const campoDispositivo = document.getElementById('token_estufa');
     const campoEspecie = document.getElementById('id_especie');
-    const camposMedidas = ['altura', 'largura', 'comprimento'].map(function (nome) {
-        return document.getElementById(nome);
-    });
+    const campoTamanhoVaso = document.getElementById('tamanho_vaso');
+    const campoVazaoBomba = document.getElementById('vazao_bomba_ml_s');
+    const botaoSalvar = document.getElementById('salvar-planta');
 
     function escaparTexto(valor) {
         return String(valor).replace(/[&<>"']/g, function (caractere) {
@@ -57,7 +84,8 @@ document.addEventListener('componentsLoaded', function () {
     }
 
     function escrever(id, texto) {
-        document.getElementById(id).textContent = texto;
+        const elemento = document.getElementById(id);
+        if (elemento) elemento.textContent = texto;
     }
 
     function alinharIndicadores() {
@@ -95,21 +123,40 @@ document.addEventListener('componentsLoaded', function () {
         });
     }
 
+    // Pequeno helper de fetch: já manda cookies de sessão, já lê o JSON de
+    // erro que os controllers devolvem ({ erro: '...' }) e já transforma
+    // uma resposta não-OK numa exceção com mensagem legível.
+    async function api(url, opcoes) {
+        const resposta = await fetch(url, Object.assign({ credentials: 'same-origin' }, opcoes));
+        let corpo = null;
+        try { corpo = await resposta.json(); } catch (erro) { corpo = null; }
+        if (!resposta.ok) {
+            const mensagem = (corpo && corpo.erro) ? corpo.erro : `Erro ${resposta.status} ao falar com o servidor.`;
+            throw new Error(mensagem);
+        }
+        return corpo;
+    }
+
     function obterPlanta() {
         return plantas.find(function (planta) { return planta.id_estufa === idEstufa; });
     }
 
     function obterEspecie(planta) {
-        return especies.find(function (especie) { return especie.id_especie === planta.id_especie; });
+        return especies.find(function (especie) { return especie.id_especie === planta.id_especie; }) || {};
     }
 
     function obterEstado(valor, metrica) {
+        if (valor === null || valor === undefined || Number.isNaN(Number(valor))) {
+            return { texto: 'Sem leitura ainda', atencao: false, semDado: true };
+        }
         if (valor < metrica.minimo) return { texto: 'Abaixo da referência', atencao: true };
         if (valor > metrica.maximo) return { texto: 'Acima da referência', atencao: true };
         return { texto: 'Na faixa de referência', atencao: false };
     }
 
     function precisaAtencao(planta) {
+        if (!planta.dadosAtuais) return false;
+        const parametros = obterParametros(obterEspecie(planta));
         return Object.entries(parametros).some(function ([chave, metrica]) {
             return obterEstado(planta.dadosAtuais[chave], metrica).atencao;
         });
@@ -140,50 +187,56 @@ document.addEventListener('componentsLoaded', function () {
     function renderizarIndicadores() {
         const planta = obterPlanta();
         if (!planta) return;
+        const parametros = obterParametros(obterEspecie(planta));
+        const dados = planta.dadosAtuais;
         document.getElementById('indicadores').innerHTML = Object.entries(parametros).map(function ([chave, metrica]) {
-            const valor = planta.dadosAtuais[chave];
+            const valor = dados ? dados[chave] : null;
             const estado = obterEstado(valor, metrica);
-            return `<button class="metric-card" data-parametro="${chave}" aria-pressed="${parametro === chave}" aria-controls="grafico" aria-label="${metrica.nome}: ${valor} ${metrica.unidade}. ${estado.texto}. Ver histórico.">
+            const textoValor = estado.semDado ? '—' : `${valor}<small> ${metrica.unidade}</small>`;
+            const larguraBarra = estado.semDado ? 0 : Math.max(0, Math.min(100, valor / metrica.escala * 100));
+            return `<button class="metric-card" data-parametro="${chave}" aria-pressed="${parametro === chave}" aria-controls="grafico" aria-label="${metrica.nome}: ${estado.semDado ? 'sem leitura ainda' : valor + ' ' + metrica.unidade}. ${estado.texto}. Ver histórico.">
                 <span class="metric-top">${metrica.nome}${icone(metrica.icone)}</span>
-                <span class="metric-value">${valor}<small> ${metrica.unidade}</small></span>
+                <span class="metric-value">${textoValor}</span>
                 <span class="metric-status${estado.atencao ? ' attention' : ''}">${icone(estado.atencao ? 'info' : 'check')}${estado.texto}</span>
-                <span class="metric-track" aria-hidden="true"><span style="width:${valor / metrica.escala * 100}%"></span></span>
+                <span class="metric-track" aria-hidden="true"><span style="width:${larguraBarra}%"></span></span>
                 <span class="metric-hint">${metrica.descricao}</span>
             </button>`;
         }).join('');
     }
 
-    function obterHistorico(planta, periodo) {
-        const periodos = {
-            hoje: ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'],
-            semana: ['17/10', '18/10', '19/10', '20/10', '21/10', '22/10', '23/10'],
-            mes: ['24/09', '27/09', '30/09', '03/10', '06/10', '09/10', '12/10', '15/10', '18/10', '21/10', '23/10']
-        };
-        const variacoes = [-6, -8, -3, 2, -1, 5, 1, -2, 4, -1, 0];
-        return periodos[periodo].map(function (rotulo, indice, lista) {
-            const fator = parametro === 'temperatura_ar' ? .4 : 1;
-            const variacao = indice === lista.length - 1 ? 0 : variacoes[(indice + planta.id_estufa) % variacoes.length];
-            const valor = Math.round((planta.dadosAtuais[parametro] + variacao * fator) * 10) / 10;
-            return { periodo: rotulo, [parametro]: valor };
-        });
-    }
-
-    function renderizarHistorico() {
+    async function renderizarHistorico() {
         const planta = obterPlanta();
         if (!planta) return;
+        const parametros = obterParametros(obterEspecie(planta));
         const metrica = parametros[parametro];
         const periodo = document.getElementById('periodo').value;
         const visualizacao = document.getElementById('visualizacao').value;
-        const dados = obterHistorico(planta, periodo);
+        const descricaoPeriodo = { hoje: 'Hoje', semana: 'Últimos 7 dias', mes: 'Últimos 30 dias' }[periodo] || periodo;
+
+        escrever('titulo-historico', `Histórico de ${metrica.nome.toLowerCase()}`);
+        escrever('legenda-metrica', `${metrica.nome} (${metrica.unidade})`);
+
+        let dados;
+        try {
+            dados = await api(`/dashboard/${planta.id_estufa}/dados?periodo=${periodo}&parametro=${parametro}`);
+        } catch (erro) {
+            document.getElementById('grafico').innerHTML = '<p class="chart-summary">Não foi possível carregar o histórico agora.</p>';
+            escrever('resumo-historico', erro.message);
+            return;
+        }
+
+        if (!dados || dados.length === 0) {
+            document.getElementById('grafico').innerHTML = '<p class="chart-summary">Ainda não há leituras registradas para este período.</p>';
+            escrever('resumo-historico', 'Assim que o Arduino enviar dados, o histórico aparece aqui.');
+            return;
+        }
+
         const valores = dados.map(function (item) { return item[parametro]; });
         const formatar = function (valor) { return valor.toLocaleString('pt-BR', { maximumFractionDigits: 1 }); };
         const media = valores.reduce(function (total, valor) { return total + valor; }, 0) / valores.length;
-        const descricaoPeriodo = { hoje: '23/10/2026, das 07:00 às 14:00', semana: '17 a 23/10/2026', mes: '24/09 a 23/10/2026' }[periodo];
-        escrever('titulo-historico', `Histórico de ${metrica.nome.toLowerCase()}`);
-        escrever('legenda-metrica', `${metrica.nome} (${metrica.unidade})`);
-        const resumo = `${descricaoPeriodo} · Média: ${formatar(media)} ${metrica.unidade}. Menor leitura: ${formatar(Math.min(...valores))} ${metrica.unidade}; maior: ${formatar(Math.max(...valores))} ${metrica.unidade}. Referência ilustrativa: ${metrica.minimo}–${metrica.maximo} ${metrica.unidade}.`;
+        const resumo = `${descricaoPeriodo} · Média: ${formatar(media)} ${metrica.unidade}. Menor leitura: ${formatar(Math.min(...valores))} ${metrica.unidade}; maior: ${formatar(Math.max(...valores))} ${metrica.unidade}. Faixa de referência: ${metrica.minimo}–${metrica.maximo} ${metrica.unidade}.`;
         escrever('resumo-historico', resumo);
-        const tabela = `<div class="table-scroll" tabindex="0" role="region" aria-label="Tabela de leituras"><table><caption>Leituras simuladas · ${descricaoPeriodo}</caption><thead><tr><th scope="col">${periodo === 'hoje' ? 'Horário' : 'Data'}</th><th scope="col">${metrica.nome}</th><th scope="col">Referência do exemplo</th></tr></thead><tbody>${dados.map(function (item) { return `<tr><th scope="row">${item.periodo}</th><td>${formatar(item[parametro])} ${metrica.unidade}</td><td>${obterEstado(item[parametro], metrica).texto}</td></tr>`; }).join('')}</tbody></table></div>`;
+        const tabela = `<div class="table-scroll" tabindex="0" role="region" aria-label="Tabela de leituras"><table><caption>Leituras · ${descricaoPeriodo}</caption><thead><tr><th scope="col">${periodo === 'hoje' ? 'Horário' : 'Data'}</th><th scope="col">${metrica.nome}</th><th scope="col">Referência</th></tr></thead><tbody>${dados.map(function (item) { return `<tr><th scope="row">${item.periodo}</th><td>${formatar(item[parametro])} ${metrica.unidade}</td><td>${obterEstado(item[parametro], metrica).texto}</td></tr>`; }).join('')}</tbody></table></div>`;
         if (visualizacao === 'tabela') {
             document.getElementById('grafico').innerHTML = tabela;
             return;
@@ -211,7 +264,7 @@ document.addEventListener('componentsLoaded', function () {
             return Math.round(indice * (pontos.length - 1) / (totalRotulos - 1));
         }));
         const rotulos = pontos.map(function (ponto, indice) { return indicesRotulos.has(indice) ? `<text x="${ponto.x}" y="211" text-anchor="middle">${ponto.periodo}</text>` : ''; }).join('');
-        document.getElementById('grafico').innerHTML = `<svg viewBox="0 0 ${largura} ${altura}" role="img" aria-labelledby="titulo-grafico descricao-grafico"><title id="titulo-grafico">${metrica.nome}: leituras simuladas em ${visualizacao === 'linha' ? 'linhas' : 'barras'}</title><desc id="descricao-grafico">${resumo} Selecione Tabela no formato do histórico para acessar todas as leituras.</desc>${faixa}${grade}${desenho}${rotulos}</svg>`;
+        document.getElementById('grafico').innerHTML = `<svg viewBox="0 0 ${largura} ${altura}" role="img" aria-labelledby="titulo-grafico descricao-grafico"><title id="titulo-grafico">${metrica.nome}: leituras em ${visualizacao === 'linha' ? 'linhas' : 'barras'}</title><desc id="descricao-grafico">${resumo} Selecione Tabela no formato do histórico para acessar todas as leituras.</desc>${faixa}${grade}${desenho}${rotulos}</svg>`;
     }
 
     function renderizarCultivo() {
@@ -232,37 +285,48 @@ document.addEventListener('componentsLoaded', function () {
         const atencao = precisaAtencao(planta);
         const estado = document.getElementById('estado-cultivo');
         estado.classList.toggle('attention', atencao);
-        estado.innerHTML = `${icone(atencao ? 'info' : 'check')}${atencao ? 'Verificar leituras' : 'Leituras na faixa'}`;
-        escrever('cena-umidade', `${dados.umidade_solo}%`);
-        escrever('cena-temperatura', `${dados.temperatura_ar} °C`);
-        escrever('dispositivo-nome', 'Greenduino · token informado');
+        estado.innerHTML = dados
+            ? `${icone(atencao ? 'info' : 'check')}${atencao ? 'Verificar leituras' : 'Leituras na faixa'}`
+            : `${icone('info')}Aguardando primeira leitura`;
+        escrever('cena-umidade', dados ? `${dados.umidade_solo}%` : '—');
+        escrever('cena-temperatura', dados ? `${dados.temperatura_ar} °C` : '—');
+        escrever('dispositivo-nome', `Greenduino · token ${planta.token_estufa}`);
+        escrever('dispositivo-ultima-leitura', dados ? `Última leitura: ${dados.ultima_atualizacao}` : 'Ainda sem leituras');
         escrever('titulo-cuidados', 'Resumo');
-        const leiturasFora = Object.entries(parametros).filter(function ([chave, metrica]) {
-            return obterEstado(dados[chave], metrica).atencao;
-        });
-        escrever('resumo-cultivo', atencao ? leiturasFora.map(function ([chave, metrica]) {
-            return `${metrica.nome}: ${dados[chave]} ${metrica.unidade}, ${dados[chave] < metrica.minimo ? 'abaixo' : 'acima'} da referência.`;
-        }).join(' ') : 'As três leituras estão na faixa de referência deste exemplo.');
-        escrever('estado-bomba', dados.bomba_acionada ? 'Irrigação em andamento' : 'Irrigação em espera');
-        escrever('descricao-bomba', dados.bomba_acionada ? 'Bomba ligada nesta simulação.' : 'Bomba desligada nesta simulação.');
-        escrever('nome-especie', especie.nome_especie);
-        escrever('nome-cientifico', especie.nome_cientifico);
+        const parametros = obterParametros(especie);
+        if (!dados) {
+            escrever('resumo-cultivo', 'Essa estufa ainda não enviou nenhuma leitura. Confira se o Arduino está ligado e com o token certo.');
+        } else {
+            const leiturasFora = Object.entries(parametros).filter(function ([chave, metrica]) {
+                return obterEstado(dados[chave], metrica).atencao;
+            });
+            escrever('resumo-cultivo', atencao ? leiturasFora.map(function ([chave, metrica]) {
+                return `${metrica.nome}: ${dados[chave]} ${metrica.unidade}, ${dados[chave] < metrica.minimo ? 'abaixo' : 'acima'} da referência.`;
+            }).join(' ') : 'As três leituras estão na faixa de referência desta espécie.');
+        }
+        escrever('estado-bomba', dados && dados.bomba_acionada ? 'Irrigação em andamento' : 'Irrigação em espera');
+        escrever('descricao-bomba', dados && dados.bomba_acionada ? 'Bomba ligada agora.' : 'Bomba desligada no momento.');
+        escrever('nome-especie', especie.nome_especie || 'Espécie não encontrada');
+        escrever('nome-cientifico', especie.nome_cientifico || '');
         renderizarIndicadores();
         renderizarHistorico();
     }
 
     function renderizarPlantas() {
         escrever('total-plantas', String(plantas.length));
-        escrever('resumo-plantas', `${plantas.length} ${plantas.length === 1 ? 'planta cadastrada' : 'plantas cadastradas'} nesta demonstração.`);
+        escrever('resumo-plantas', `${plantas.length} ${plantas.length === 1 ? 'planta cadastrada' : 'plantas cadastradas'}.`);
         const lista = document.getElementById('lista-plantas');
         if (!plantas.length) {
             lista.innerHTML = `<div class="empty-state">${icone('leaf')}<h2>Nenhuma planta cadastrada</h2><p>Cadastre uma planta para acompanhar seus indicadores.</p><button class="button button-primary" data-cadastrar>Cadastrar planta</button></div>`;
             return;
         }
         lista.innerHTML = plantas.map(function (planta) {
+            const semDados = !planta.dadosAtuais;
             const atencao = precisaAtencao(planta);
             const nome = escaparTexto(planta.nome_estufa);
-            return `<article class="plant-card"><div class="plant-art"><img src="/assets/images/planta-dashboard.svg" alt="" width="145" height="145"></div><div class="plant-details"><span class="status-pill${atencao ? ' attention' : ''}">${icone(atencao ? 'info' : 'check')}${atencao ? 'Vale conferir' : 'Em equilíbrio'}</span><h3>${nome}</h3><p>${obterEspecie(planta).nome_especie}</p><span class="plant-device">${icone('chip')}Greenduino · exemplo</span></div><div class="plant-actions"><button class="text-button" data-acompanhar="${planta.id_estufa}" aria-label="Acompanhar ${nome}">Acompanhar ${icone('arrow')}</button><button class="icon-button" data-editar="${planta.id_estufa}" aria-label="Editar ${nome}">${icone('edit')}</button><button class="icon-button danger" data-excluir="${planta.id_estufa}" aria-label="Excluir ${nome}">${icone('trash')}</button></div></article>`;
+            const especie = obterEspecie(planta);
+            const status = semDados ? 'Aguardando leitura' : (atencao ? 'Vale conferir' : 'Em equilíbrio');
+            return `<article class="plant-card"><div class="plant-art"><img src="/assets/images/planta-dashboard.svg" alt="" width="145" height="145"></div><div class="plant-details"><span class="status-pill${!semDados && atencao ? ' attention' : ''}">${icone(semDados || atencao ? 'info' : 'check')}${status}</span><h3>${nome}</h3><p>${especie.nome_especie || 'Espécie não encontrada'}</p><span class="plant-device">${icone('chip')}Token ${escaparTexto(planta.token_estufa)}</span></div><div class="plant-actions"><button class="text-button" data-acompanhar="${planta.id_estufa}" aria-label="Acompanhar ${nome}">Acompanhar ${icone('arrow')}</button><button class="icon-button" data-editar="${planta.id_estufa}" aria-label="Editar ${nome}">${icone('edit')}</button><button class="icon-button danger" data-excluir="${planta.id_estufa}" aria-label="Excluir ${nome}">${icone('trash')}</button></div></article>`;
         }).join('');
     }
 
@@ -285,15 +349,52 @@ document.addEventListener('componentsLoaded', function () {
             campoNome.value = planta.nome_estufa;
             campoEspecie.value = String(planta.id_especie);
             campoDispositivo.value = planta.token_estufa;
-            camposMedidas.forEach(function (campo) { campo.value = planta[campo.name]; });
+            campoTamanhoVaso.value = planta.tamanho_vaso || 'M';
+            campoVazaoBomba.value = planta.vazao_bomba_ml_s != null ? planta.vazao_bomba_ml_s : '';
+        } else {
+            campoTamanhoVaso.value = 'M';
         }
         abrirModal(modalPlanta);
         campoNome.focus();
     }
 
+    // Busca a lista real de estufas do usuário e, pra cada uma, a leitura
+    // mais recente (reaproveita a inicial do window.GREENDUINO pra estufa
+    // que já veio renderizada no HTML, evitando uma chamada extra).
+    async function carregarPlantas() {
+        const estufas = await api(`/api/estufas/usuario/${GREENDUINO.idUsuario}`);
+        plantas = await Promise.all(estufas.map(async function (estufa) {
+            if (estufa.id_estufa === GREENDUINO.idEstufaInicial && GREENDUINO.dadosAtuaisIniciais !== undefined) {
+                return Object.assign({}, estufa, { dadosAtuais: GREENDUINO.dadosAtuaisIniciais });
+            }
+            try {
+                const dadosAtuais = await api(`/dashboard/${estufa.id_estufa}/atual`);
+                return Object.assign({}, estufa, { dadosAtuais: dadosAtuais });
+            } catch (erro) {
+                return Object.assign({}, estufa, { dadosAtuais: null });
+            }
+        }));
+    }
+
+    // Troca a planta acompanhada: renderiza na hora com o que já se tem em
+    // memória, e busca a leitura mais atual em segundo plano (os dados
+    // carregados no início da sessão podem já estar com alguns minutos).
+    async function selecionarPlanta(novoId) {
+        idEstufa = novoId;
+        renderizarCultivo();
+        try {
+            const atual = await api(`/dashboard/${novoId}/atual`);
+            const planta = plantas.find(function (item) { return item.id_estufa === novoId; });
+            if (planta) planta.dadosAtuais = atual;
+        } catch (erro) {
+            // Mantém os últimos dados conhecidos em caso de falha de rede.
+        }
+        if (idEstufa === novoId) renderizarCultivo();
+    }
+
     campoNome.addEventListener('input', function () { campoNome.setCustomValidity(''); });
     campoDispositivo.addEventListener('input', function () { campoDispositivo.setCustomValidity(''); });
-    formulario.addEventListener('submit', function (evento) {
+    formulario.addEventListener('submit', async function (evento) {
         evento.preventDefault();
         const nome = campoNome.value.trim();
         if (!nome) {
@@ -301,8 +402,7 @@ document.addEventListener('componentsLoaded', function () {
             campoNome.reportValidity();
             return;
         }
-        const id = Number(document.getElementById('id_estufa').value);
-        const planta = plantas.find(function (item) { return item.id_estufa === id; });
+        const id = Number(document.getElementById('id_estufa').value) || null;
         const token = campoDispositivo.value.trim();
         if (!token) {
             campoDispositivo.setCustomValidity('Informe o código do token do seu Greenduino.');
@@ -310,24 +410,39 @@ document.addEventListener('componentsLoaded', function () {
             return;
         }
         if (!formulario.reportValidity()) return;
-        const especieValida = especies.some(function (item) { return item.id_especie === Number(campoEspecie.value); });
-        const emUso = plantas.some(function (item) { return item.token_estufa === token && item.id_estufa !== id; });
-        if (!especieValida || emUso) {
-            escrever('erro-formulario', emUso ? 'Este token já está associado a outra planta nesta demonstração.' : 'Selecione uma espécie para sua planta.');
+        if (!campoEspecie.value) {
+            escrever('erro-formulario', 'Selecione uma espécie para sua planta.');
             return;
         }
-        const cadastro = { nome_estufa: nome, id_especie: Number(campoEspecie.value), token_estufa: token };
-        camposMedidas.forEach(function (campo) { cadastro[campo.name] = campo.valueAsNumber; });
-        if (planta) Object.assign(planta, cadastro);
-        else {
-            const novaPlanta = { ...cadastro, id_estufa: proximoId++, dadosAtuais: { umidade_solo: 59, temperatura_ar: 25, umidade_ar: 65, bomba_acionada: false } };
-            plantas.push(novaPlanta);
-            idEstufa = novaPlanta.id_estufa;
+
+        const corpo = {
+            nome_estufa: nome,
+            id_especie: Number(campoEspecie.value),
+            token_estufa: token,
+            tamanho_vaso: campoTamanhoVaso.value,
+            vazao_bomba_ml_s: campoVazaoBomba.value ? Number(campoVazaoBomba.value) : null
+        };
+
+        botaoSalvar.disabled = true;
+        escrever('erro-formulario', '');
+        try {
+            if (id) {
+                await api(`/api/estufas/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+            } else {
+                const resultado = await api('/api/estufas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+                idEstufa = resultado.id_estufa;
+            }
+            await carregarPlantas();
+            if (id) idEstufa = id;
+            renderizarCultivo();
+            renderizarPlantas();
+            modalPlanta.close();
+            mostrarMensagem(id ? 'Cadastro atualizado.' : 'Planta cadastrada!');
+        } catch (erro) {
+            escrever('erro-formulario', erro.message);
+        } finally {
+            botaoSalvar.disabled = false;
         }
-        renderizarCultivo();
-        renderizarPlantas();
-        modalPlanta.close();
-        mostrarMensagem(planta ? 'Cadastro atualizado nesta demonstração.' : 'Planta cadastrada! As leituras exibidas são de exemplo.');
     });
 
     document.addEventListener('click', function (evento) {
@@ -338,15 +453,14 @@ document.addEventListener('componentsLoaded', function () {
         if (botao.hasAttribute('data-excluir')) {
             idExcluir = Number(botao.dataset.excluir);
             const planta = plantas.find(function (item) { return item.id_estufa === idExcluir; });
-            escrever('descricao-excluir', `“${planta.nome_estufa}” será removida desta demonstração, junto com suas medidas e o token informado. Você pode cancelar e manter a planta.`);
+            escrever('descricao-excluir', `“${planta.nome_estufa}” será removida, junto com o token cadastrado. Essa ação não pode ser desfeita.`);
             abrirModal(modalExcluir);
         }
         if (botao.hasAttribute('data-fechar')) botao.closest('dialog').close();
         if (botao.hasAttribute('data-ajuda')) abrirModal(document.getElementById('modal-ajuda'));
         if (botao.dataset.pagina) mudarPagina(botao.dataset.pagina, true);
         if (botao.dataset.acompanhar) {
-            idEstufa = Number(botao.dataset.acompanhar);
-            renderizarCultivo();
+            selecionarPlanta(Number(botao.dataset.acompanhar));
             mudarPagina('inicio', true);
         }
         if (botao.dataset.parametro) {
@@ -361,20 +475,31 @@ document.addEventListener('componentsLoaded', function () {
         });
     });
 
-    document.getElementById('confirmar-exclusao').addEventListener('click', function () {
-        plantas = plantas.filter(function (planta) { return planta.id_estufa !== idExcluir; });
-        if (idEstufa === idExcluir) idEstufa = plantas.length ? plantas[0].id_estufa : null;
-        renderizarCultivo();
-        renderizarPlantas();
-        modalExcluir.close();
-        mostrarMensagem('Planta excluída desta demonstração.');
-        idExcluir = null;
+    document.getElementById('confirmar-exclusao').addEventListener('click', async function () {
+        const botaoConfirmar = this;
+        botaoConfirmar.disabled = true;
+        try {
+            await api(`/api/estufas/${idExcluir}`, { method: 'DELETE' });
+            await carregarPlantas();
+            if (!obterPlanta()) {
+                idEstufa = plantas.length ? plantas[0].id_estufa : null;
+            }
+            renderizarCultivo();
+            renderizarPlantas();
+            modalExcluir.close();
+            mostrarMensagem('Planta excluída.');
+        } catch (erro) {
+            mostrarMensagem('Não foi possível excluir: ' + erro.message);
+        } finally {
+            botaoConfirmar.disabled = false;
+            idExcluir = null;
+        }
     });
     document.getElementById('editar-planta').addEventListener('click', function () { abrirFormulario(idEstufa); });
-    document.getElementById('planta-selecionada').addEventListener('change', function (evento) {
-        idEstufa = Number(evento.target.value);
-        renderizarCultivo();
-        mostrarMensagem(`Agora acompanhando ${obterPlanta().nome_estufa}.`);
+    document.getElementById('planta-selecionada').addEventListener('change', async function (evento) {
+        await selecionarPlanta(Number(evento.target.value));
+        const planta = obterPlanta();
+        if (planta) mostrarMensagem(`Agora acompanhando ${planta.nome_estufa}.`);
     });
     document.getElementById('periodo').addEventListener('change', renderizarHistorico);
     document.getElementById('visualizacao').addEventListener('change', renderizarHistorico);
@@ -384,16 +509,38 @@ document.addEventListener('componentsLoaded', function () {
             else document.querySelector(`[data-pagina="${pagina}"]`).focus();
         });
     });
-    renderizarCultivo();
-    renderizarPlantas();
-    const observadorCena = new ResizeObserver(alinharIndicadores);
-    document.querySelectorAll('.scene, .scene-label').forEach(function (elemento) { observadorCena.observe(elemento); });
-    let larguraGrafico = 0;
-    new ResizeObserver(function (entradas) {
-        const largura = entradas[0].contentRect.width;
-        if (largura > 0 && largura !== larguraGrafico) {
-            larguraGrafico = largura;
-            renderizarHistorico();
+
+    async function iniciar() {
+        try {
+            especies = await api('/api/especies');
+        } catch (erro) {
+            especies = [];
+            mostrarMensagem('Não foi possível carregar a lista de espécies: ' + erro.message);
         }
-    }).observe(document.getElementById('grafico'));
+
+        try {
+            await carregarPlantas();
+        } catch (erro) {
+            plantas = [];
+            mostrarMensagem('Não foi possível carregar suas plantas: ' + erro.message);
+        }
+
+        if (!idEstufa && plantas.length) idEstufa = plantas[0].id_estufa;
+
+        renderizarCultivo();
+        renderizarPlantas();
+
+        const observadorCena = new ResizeObserver(alinharIndicadores);
+        document.querySelectorAll('.scene, .scene-label').forEach(function (elemento) { observadorCena.observe(elemento); });
+        let larguraGrafico = 0;
+        new ResizeObserver(function (entradas) {
+            const largura = entradas[0].contentRect.width;
+            if (largura > 0 && largura !== larguraGrafico) {
+                larguraGrafico = largura;
+                renderizarHistorico();
+            }
+        }).observe(document.getElementById('grafico'));
+    }
+
+    iniciar();
 });

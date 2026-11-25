@@ -78,6 +78,9 @@ module.exports = {
 
             greenduinoBanco.cadastrarEstufa(estufa, connection, function(err, result) {
                 if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(409).json({ erro: 'Esse token já está sendo usado por outra estufa.' });
+                    }
                     console.error('Erro ao salvar estufa:', err);
                     return res.status(500).json({ erro: 'Erro interno ao salvar estufa.' });
                 }
@@ -90,18 +93,55 @@ module.exports = {
         });
     },
 
-    // Dono já conferido pelo middleware autorizacaoEstufa.
+    // Dono já conferido pelo middleware autorizacaoEstufa (req.estufa tem o
+    // estado atual da estufa, usado abaixo como fallback pros campos que
+    // não vierem no corpo da requisição).
     atualizarEstufa: function(req, res) {
         const { id_estufa } = req.params;
         const dadosAtualizados = req.body;
         const connection = connectionFactory();
 
-        greenduinoBanco.alterarEstufa(id_estufa, dadosAtualizados, connection, function(err, result) {
-            if (err) {
-                console.error('Erro ao atualizar estufa:', err);
-                return res.status(500).json({ erro: 'Erro interno ao atualizar estufa.' });
+        // Se espécie ou vaso mudaram, recalcula o tempo_irrigacao "de
+        // exibição" também - mesma lógica do cadastro (ver
+        // irrigacaoService.js), pra esse cache não ficar desatualizado
+        // depois de uma edição. O valor realmente usado na irrigação
+        // continua sendo recalculado do zero em
+        // GET /api/parametros/:token_estufa, então isso é só pro dashboard
+        // não mostrar um número velho.
+        const idEspecie = dadosAtualizados.id_especie || req.estufa.id_especie;
+        const tamanhoVaso = dadosAtualizados.tamanho_vaso || req.estufa.tamanho_vaso;
+        const vazaoBomba = dadosAtualizados.vazao_bomba_ml_s !== undefined
+            ? dadosAtualizados.vazao_bomba_ml_s
+            : req.estufa.vazao_bomba_ml_s;
+
+        greenduinoBanco.buscarEspeciePorId(idEspecie, connection, function(errEspecie, especies) {
+            if (errEspecie) {
+                console.error('Erro ao buscar espécie para recalcular irrigação:', errEspecie);
+                return res.status(500).json({ erro: 'Erro interno ao validar espécie.' });
             }
-            return res.status(200).json({ mensagem: 'Estufa atualizada com sucesso!' });
+
+            if (especies.length === 0) {
+                return res.status(400).json({ erro: 'Espécie informada não existe.' });
+            }
+
+            const especie = especies[0];
+            dadosAtualizados.tempo_irrigacao = calcularTempoIrrigacaoMs({
+                umidade_minima: especie.umidade_minima,
+                umidade_ideal: especie.umidade_ideal,
+                tamanho_vaso: tamanhoVaso,
+                vazao_bomba_ml_s: vazaoBomba
+            });
+
+            greenduinoBanco.alterarEstufa(id_estufa, dadosAtualizados, connection, function(err, result) {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(409).json({ erro: 'Esse token já está sendo usado por outra estufa.' });
+                    }
+                    console.error('Erro ao atualizar estufa:', err);
+                    return res.status(500).json({ erro: 'Erro interno ao atualizar estufa.' });
+                }
+                return res.status(200).json({ mensagem: 'Estufa atualizada com sucesso!' });
+            });
         });
     },
 

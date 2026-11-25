@@ -124,7 +124,11 @@ module.exports = {
                 admin: usuario.admin
             };
 
-            res.redirect('/dispositivos');
+            // '/dashboard' decide pra onde ir (primeira estufa do usuário,
+            // ou a tela de "cadastre sua primeira planta" se ele não tiver
+            // nenhuma ainda). '/dispositivos' continua existindo mas é só
+            // placeholder.
+            res.redirect('/dashboard');
         });
     },
 

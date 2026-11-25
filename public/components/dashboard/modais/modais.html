@@ -13,31 +13,32 @@
         </div>
         <div class="input-group"><label for="id_especie">Qual é a espécie?</label><select id="id_especie" name="id_especie" required></select></div>
         <fieldset class="cultivation-dimensions" aria-describedby="ajuda-medidas">
-            <legend>Tamanho do vaso ou da área de cultivo</legend>
-            <p id="ajuda-medidas">Informe as três medidas em centímetros (cm).</p>
+            <legend>Vaso e irrigação</legend>
+            <p id="ajuda-medidas">Usados para calcular quanto tempo a bomba deve ficar ligada em cada rega.</p>
             <div class="dimensions-grid">
                 <div class="input-group">
-                    <label for="altura">Altura (cm)</label>
-                    <input type="number" id="altura" name="altura" min="0.1" step="0.1" inputmode="decimal" placeholder="Ex.: 25" required>
+                    <label for="tamanho_vaso">Tamanho do vaso</label>
+                    <select id="tamanho_vaso" name="tamanho_vaso" required>
+                        <option value="P">Pequeno (até ~2L)</option>
+                        <option value="M" selected>Médio (até ~5L)</option>
+                        <option value="G">Grande (até ~15L)</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label for="largura">Largura (cm)</label>
-                    <input type="number" id="largura" name="largura" min="0.1" step="0.1" inputmode="decimal" placeholder="Ex.: 30" required>
-                </div>
-                <div class="input-group">
-                    <label for="comprimento">Comprimento (cm)</label>
-                    <input type="number" id="comprimento" name="comprimento" min="0.1" step="0.1" inputmode="decimal" placeholder="Ex.: 30" required>
+                    <label for="vazao_bomba_ml_s">Vazão da bomba (mL/s)</label>
+                    <input type="number" id="vazao_bomba_ml_s" name="vazao_bomba_ml_s" min="1" step="0.1" inputmode="decimal" placeholder="Ex.: 50" aria-describedby="ajuda-vazao">
+                    <small id="ajuda-vazao">Meça quantos mL a bomba puxa em 10s e divida por 10. Se não souber ainda, deixe em branco.</small>
                 </div>
             </div>
         </fieldset>
         <div class="input-group">
             <label for="token_estufa">Código do token do Greenduino</label>
             <input type="text" id="token_estufa" name="token_estufa" placeholder="Ex.: GRD-AB12-CD34" maxlength="255" autocomplete="off" autocapitalize="none" spellcheck="false" required aria-describedby="ajuda-dispositivo">
-            <small id="ajuda-dispositivo">Digite o código que acompanha sua unidade. Nesta prévia, a conexão é apenas ilustrativa.</small>
+            <small id="ajuda-dispositivo">Digite o mesmo token configurado no firmware do seu Greenduino (config_rede.h).</small>
         </div>
         <div class="form-note">
             <svg class="icon"><use href="#icon-info"/></svg>
-            <p>A espécie ajuda a contextualizar os indicadores. As faixas desta prévia são ilustrativas, não recomendações de cultivo.</p>
+            <p>A espécie e o tamanho do vaso são usados para calcular a irrigação automática.</p>
         </div>
         <p id="erro-formulario" class="field-error" role="alert"></p>
         <div class="modal-actions">
@@ -74,6 +75,5 @@
         <h3>Irrigação e histórico</h3>
         <p>A irrigação indica se a bomba está ligada. No histórico, escolha linhas, barras ou tabela para acompanhar as leituras.</p>
     </div>
-    <div class="form-note"><p>Todos os valores, estados e faixas são exemplos. Nenhum comando é enviado a um dispositivo.</p></div>
     <button class="button button-primary help-close" data-fechar>Entendi</button>
 </dialog>

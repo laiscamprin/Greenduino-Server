@@ -17,7 +17,6 @@
             <div class="workspace">
                 <header class="topbar">
                     <div class="breadcrumb">Meu espaço <span>/</span><strong id="pagina-atual">Visão geral</strong></div>
-                    <span class="demo-badge">Demonstração</span>
                 </header>
                 <main id="conteudo" tabindex="-1">
                     <div class="page-heading">
@@ -26,10 +25,6 @@
                             <p id="subtitulo-pagina">Acompanhe suas plantas e as condições do cultivo.</p>
                         </div>
                         <button class="button button-primary" data-cadastrar><svg class="icon"><use href="#icon-plus"/></svg>Cadastrar planta</button>
-                    </div>
-                    <div class="demo-note">
-                        <svg class="icon"><use href="#icon-info"/></svg>
-                        <p>Dados simulados. Recarregar a página restaura os cadastros de exemplo.</p>
                     </div>
                     <section id="pagina-inicio" aria-label="Visão geral do cultivo">
                         <div class="section-toolbar">
@@ -44,7 +39,7 @@
                         <div id="cultivo-vazio" class="empty-state" hidden>
                             <svg class="icon"><use href="#icon-leaf"/></svg>
                             <h2>Nenhuma planta cadastrada</h2>
-                            <p>Cadastre uma planta para explorar os indicadores de exemplo.</p>
+                            <p>Cadastre uma planta para começar a acompanhar os indicadores.</p>
                             <button class="button button-primary" data-cadastrar>Cadastrar minha primeira planta</button>
                         </div>
                     </section>
@@ -60,7 +55,18 @@
         </div>
         <div id="dashboard-modais-placeholder" data-dashboard-component></div>
         <div id="mensagem" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-        <noscript><p class="noscript">Ative o JavaScript para explorar o dashboard e cadastrar plantas nesta demonstração.</p></noscript>
+        <noscript><p class="noscript">Ative o JavaScript para explorar o dashboard e cadastrar plantas.</p></noscript>
+        <script>
+            // Dados vindos da sessão/banco no momento em que a página foi
+            // renderizada - o dashboard.js usa isso pra saber de quem são
+            // os dados e pra não precisar buscar de novo a leitura da
+            // estufa que já abriu a tela carregada.
+            window.GREENDUINO = <%- JSON.stringify({
+                idUsuario: usuario.id,
+                idEstufaInicial: estufa ? estufa.id_estufa : null,
+                dadosAtuaisIniciais: dadosAtuais || null
+            }) %>;
+        </script>
         <script src="/utils/loadComponents.js"></script>
         <script src="/components/dashboard/dashboard.js"></script>
     </body>
