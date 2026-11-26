@@ -7,6 +7,6 @@ module.exports = function(req, res, next) {
         return res.status(401).json({ erro: 'É necessário estar logado.' });
     }
 
-    res.redirect('/login');
+    res.redirect('/usuario/login');
 
 };
