@@ -124,17 +124,14 @@ module.exports = {
                 admin: usuario.admin
             };
 
-            // '/dashboard' decide pra onde ir (primeira estufa do usuário,
-            // ou a tela de "cadastre sua primeira planta" se ele não tiver
-            // nenhuma ainda). '/dispositivos' continua existindo mas é só
-            // placeholder.
+
             res.redirect('/dashboard');
         });
     },
 
     renderPerfil: function(req, res, next) {
         if (!req.session.usuario) {
-            return res.redirect('/login');
+            return res.redirect('/usuario/login');
         }
         res.render('autenticacao/meu-perfil', {
             usuario: req.session.usuario,
@@ -207,7 +204,7 @@ module.exports = {
 
     renderSenha: function(req, res) {
         if (!req.session.usuario) {
-            return res.redirect('/login');
+            return res.redirect('/usuario/login');
         }
         res.render('autenticacao/meu-perfil', {
             usuario: req.session.usuario,
@@ -287,7 +284,7 @@ module.exports = {
 
     logout: function(req, res) {
         req.session.destroy(function(err) {
-            res.redirect('/login');
+            res.redirect('/usuario/login');
         });
     }
 };

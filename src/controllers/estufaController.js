@@ -23,15 +23,13 @@ module.exports = {
         });
     },
 
-    // A checagem de dono já foi feita pelo middleware autorizacaoEstufa,
-    // que deixa a estufa carregada em req.estufa.
+
     buscarPorId: function(req, res) {
         return res.status(200).json(req.estufa);
     },
 
     cadastrarEstufa: function(req, res) {
-        // Pega o id_usuario direto da sessão por segurança (nunca confia no
-        // que vier do corpo da requisição pra isso).
+
         const id_usuario = req.session.usuario.id;
         const { nome_estufa, id_especie, token_estufa, modo_cultivo, tamanho_vaso, area_m2, vazao_bomba_ml_s } = req.body;
 
@@ -41,9 +39,7 @@ module.exports = {
             });
         }
 
-        // 'VASO' é o padrão (compatível com estufas cadastradas antes dessa
-        // opção existir). Em modo 'HORTA' a área em m² é obrigatória - sem
-        // ela não dá pra calcular quanto regar (ver irrigacaoService.js).
+
         const modoCultivo = modo_cultivo === 'HORTA' ? 'HORTA' : 'VASO';
         if (modoCultivo === 'HORTA' && !(Number(area_m2) > 0)) {
             return res.status(400).json({
@@ -53,11 +49,6 @@ module.exports = {
 
         const connection = connectionFactory();
 
-        // Busca a espécie escolhida pra já deixar um tempo_irrigacao de
-        // referência salvo (só pra exibição rápida no dashboard/listagem).
-        // O valor realmente usado na irrigação é sempre recalculado do zero
-        // quando o Arduino busca os parâmetros em
-        // GET /api/parametros/:token_estufa - esse aqui nunca fica estagnado.
         greenduinoBanco.buscarEspeciePorId(id_especie, connection, function(errEspecie, especies) {
             if (errEspecie) {
                 console.error('Erro ao buscar espécie para calcular irrigação:', errEspecie);
@@ -107,21 +98,13 @@ module.exports = {
         });
     },
 
-    // Dono já conferido pelo middleware autorizacaoEstufa (req.estufa tem o
-    // estado atual da estufa, usado abaixo como fallback pros campos que
-    // não vierem no corpo da requisição).
+
     atualizarEstufa: function(req, res) {
         const { id_estufa } = req.params;
         const dadosAtualizados = req.body;
         const connection = connectionFactory();
 
-        // Se espécie ou vaso mudaram, recalcula o tempo_irrigacao "de
-        // exibição" também - mesma lógica do cadastro (ver
-        // irrigacaoService.js), pra esse cache não ficar desatualizado
-        // depois de uma edição. O valor realmente usado na irrigação
-        // continua sendo recalculado do zero em
-        // GET /api/parametros/:token_estufa, então isso é só pro dashboard
-        // não mostrar um número velho.
+
         const idEspecie = dadosAtualizados.id_especie || req.estufa.id_especie;
         const modoCultivo = dadosAtualizados.modo_cultivo === 'HORTA' || (dadosAtualizados.modo_cultivo === undefined && req.estufa.modo_cultivo === 'HORTA')
             ? 'HORTA'
@@ -140,8 +123,7 @@ module.exports = {
             });
         }
 
-        // Garante que os dois campos ficam consistentes com o modo
-        // escolhido mesmo que o front só tenha mandado um dos dois.
+
         dadosAtualizados.modo_cultivo = modoCultivo;
         dadosAtualizados.area_m2 = modoCultivo === 'HORTA' ? areaM2 : null;
 
@@ -178,7 +160,7 @@ module.exports = {
         });
     },
 
-    // Dono já conferido pelo middleware autorizacaoEstufa.
+
     excluirEstufa: function(req, res) {
         const { id_estufa } = req.params;
         const connection = connectionFactory();

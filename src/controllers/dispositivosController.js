@@ -28,9 +28,6 @@ module.exports = {
                 return next(err);
             }
 
-            // Antes renderizava 'dispositivo/cadastrarEstufa' (singular), mas
-            // a pasta de views é 'dispositivos/' (plural) - dava erro
-            // "Failed to lookup view" sempre que essa tela era aberta.
             res.render('dispositivos/cadastrarEstufa', {
                 usuario: req.session.usuario,
                 especies: especies
