@@ -7,7 +7,8 @@ module.exports = {
         const {
             nome_especie, nome_cientifico,
             temperatura_minima, temperatura_ideal, temperatura_maxima,
-            umidade_minima, umidade_ideal, umidade_maxima
+            umidade_solo_minima, umidade_solo_ideal, umidade_solo_maxima,
+            umidade_ar_minima, umidade_ar_ideal, umidade_ar_maxima
         } = req.body;
 
         if (!nome_especie || !nome_cientifico) {
@@ -22,11 +23,12 @@ module.exports = {
             temperatura_minima: temperatura_minima || null,
             temperatura_ideal: temperatura_ideal || null,
             temperatura_maxima: temperatura_maxima || null,
-            // umidade_* aqui é umidade do SOLO (é o que o higrômetro mede e
-            // o que o Arduino usa como gatilho/alvo de irrigação).
-            umidade_minima: umidade_minima || null,
-            umidade_ideal: umidade_ideal || null,
-            umidade_maxima: umidade_maxima || null
+            umidade_solo_minima: umidade_solo_minima || null,
+            umidade_solo_ideal: umidade_solo_ideal || null,
+            umidade_solo_maxima: umidade_solo_maxima || null,
+            umidade_ar_minima: umidade_ar_minima || null,
+            umidade_ar_ideal: umidade_ar_ideal || null,
+            umidade_ar_maxima: umidade_ar_maxima || null
         };
 
         const connection = connectionFactory();

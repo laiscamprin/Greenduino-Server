@@ -16,9 +16,12 @@ CREATE TABLE usuarios (
     temperatura_minima DECIMAL(10,2),
     temperatura_ideal DECIMAL(10,2),
     temperatura_maxima DECIMAL(10,2),
-    umidade_minima DECIMAL(10,2),
-    umidade_ideal DECIMAL(10,2),
-    umidade_maxima DECIMAL(10,2)
+    umidade_solo_minima DECIMAL(10,2),
+    umidade_solo_ideal DECIMAL(10,2),
+    umidade_solo_maxima DECIMAL(10,2),
+    umidade_ar_minima DECIMAL(10,2),
+    umidade_ar_ideal DECIMAL(10,2),
+    umidade_ar_maxima DECIMAL(10,2)
     );
 
 CREATE TABLE estufas (
@@ -26,7 +29,9 @@ CREATE TABLE estufas (
     nome_estufa VARCHAR(255) NOT NULL,
     id_usuario INT NOT NULL,
     id_especie INT NOT NULL,
+    modo_cultivo ENUM('VASO','HORTA') NOT NULL DEFAULT 'VASO',
     tamanho_vaso ENUM('P','M','G') NOT NULL DEFAULT 'M',
+    area_m2 DECIMAL(6,2),
     vazao_bomba_ml_s DECIMAL(10,2),
     tempo_irrigacao DECIMAL(10,2),
     token_estufa VARCHAR(255) UNIQUE,

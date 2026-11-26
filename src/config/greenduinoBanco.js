@@ -1,6 +1,5 @@
 module.exports = function() {
 
-    // CRUD API Arduino
     this.idEstufa = function(tokenEstufa, connection, callback) {
         connection.query('SELECT id_estufa FROM estufas WHERE token_estufa = ?', tokenEstufa, callback);
     };
@@ -10,14 +9,13 @@ module.exports = function() {
     };
 
     this.envioParametros = function(tokenEstufa, connection, callback) {
-        // Traz tudo que o irrigacaoService precisa pra calcular o tempo de
-        // irrigação na hora: a faixa de umidade da espécie e o vaso/vazão
-        // específicos dessa estufa.
         const sql = `
             SELECT
-                ep.umidade_minima,
-                ep.umidade_ideal,
+                ep.umidade_solo_minima AS umidade_minima,
+                ep.umidade_solo_ideal AS umidade_ideal,
+                e.modo_cultivo,
                 e.tamanho_vaso,
+                e.area_m2,
                 e.vazao_bomba_ml_s
             FROM estufas e
             INNER JOIN especies ep ON e.id_especie = ep.id_especie
@@ -26,7 +24,7 @@ module.exports = function() {
         connection.query(sql, tokenEstufa, callback);
     };
 
-    // CRUD Gerenciamento de Estufas e Espécies
+
     this.cadastrarEstufa = function(estufa, connection, callback) {
         connection.query('INSERT INTO estufas SET ?', estufa, callback);
     };

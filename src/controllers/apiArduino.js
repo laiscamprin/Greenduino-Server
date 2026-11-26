@@ -64,21 +64,14 @@ module.exports = {
 
             const linha = results[0];
 
-            // O tempo de irrigação é calculado aqui, na hora, a partir da
-            // espécie + tamanho do vaso + vazão da bomba cadastrados -
-            // nunca fica "parado" num valor antigo no banco.
             const tempoIrrigacaoMs = calcularTempoIrrigacaoMs({
                 umidade_minima: linha.umidade_minima,
                 umidade_ideal: linha.umidade_ideal,
+                modo_cultivo: linha.modo_cultivo,
                 tamanho_vaso: linha.tamanho_vaso,
+                area_m2: linha.area_m2,
                 vazao_bomba_ml_s: linha.vazao_bomba_ml_s
             });
-
-            // Chaves alinhadas com o que o firmware (config_rede.h) espera:
-            // doc["umidade_minima"] e doc["tempo_irrigacao_ms"]. Antes o
-            // backend mandava "tempo_irrigacao" (sem "_ms"), que não batia
-            // com o que o Arduino lia - então tempoIrrigacao chegava sempre
-            // como 0 no receptor e a bomba nunca era acionada.
             return response.status(200).json({
                 umidade_minima: linha.umidade_minima,
                 tempo_irrigacao_ms: tempoIrrigacaoMs

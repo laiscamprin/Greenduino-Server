@@ -25,9 +25,7 @@ document.addEventListener('componentsLoaded', function () {
     // agronômicos, só um ponto de partida visual.
     const PADRAO_UMIDADE_SOLO = { minimo: 40, maximo: 75 };
     const PADRAO_TEMPERATURA_AR = { minimo: 18, maximo: 30 };
-    // Ainda não existe uma faixa ideal de umidade do ar por espécie no banco
-    // (só solo e temperatura têm min/ideal/max) - fica fixa até existir.
-    const UMIDADE_AR = { minimo: 50, maximo: 80 };
+    const PADRAO_UMIDADE_AR = { minimo: 50, maximo: 80 };
 
     function numeroOuPadrao(valor, padrao) {
         const numero = Number(valor);
@@ -39,8 +37,8 @@ document.addEventListener('componentsLoaded', function () {
         return {
             umidade_solo: {
                 nome: 'Umidade do solo', unidade: '%', icone: 'drop', escala: 100,
-                minimo: numeroOuPadrao(e.umidade_minima, PADRAO_UMIDADE_SOLO.minimo),
-                maximo: numeroOuPadrao(e.umidade_maxima, PADRAO_UMIDADE_SOLO.maximo),
+                minimo: numeroOuPadrao(e.umidade_solo_minima, PADRAO_UMIDADE_SOLO.minimo),
+                maximo: numeroOuPadrao(e.umidade_solo_maxima, PADRAO_UMIDADE_SOLO.maximo),
                 descricao: 'A umidade presente na terra'
             },
             temperatura_ar: {
@@ -51,7 +49,8 @@ document.addEventListener('componentsLoaded', function () {
             },
             umidade_ar: {
                 nome: 'Umidade do ar', unidade: '%', icone: 'air', escala: 100,
-                minimo: UMIDADE_AR.minimo, maximo: UMIDADE_AR.maximo,
+                minimo: numeroOuPadrao(e.umidade_ar_minima, PADRAO_UMIDADE_AR.minimo),
+                maximo: numeroOuPadrao(e.umidade_ar_maxima, PADRAO_UMIDADE_AR.maximo),
                 descricao: 'A umidade presente no ambiente'
             }
         };
@@ -69,7 +68,11 @@ document.addEventListener('componentsLoaded', function () {
     const campoNome = document.getElementById('nome_estufa');
     const campoDispositivo = document.getElementById('token_estufa');
     const campoEspecie = document.getElementById('id_especie');
+    const campoModoCultivo = document.getElementById('modo_cultivo');
     const campoTamanhoVaso = document.getElementById('tamanho_vaso');
+    const campoAreaHorta = document.getElementById('area_m2');
+    const blocoTamanhoVaso = document.getElementById('bloco-tamanho-vaso');
+    const blocoAreaHorta = document.getElementById('bloco-area-horta');
     const campoVazaoBomba = document.getElementById('vazao_bomba_ml_s');
     const botaoSalvar = document.getElementById('salvar-planta');
 
@@ -335,6 +338,15 @@ document.addEventListener('componentsLoaded', function () {
         modal.showModal();
     }
 
+
+    function alternarModoCultivo() {
+        const ehHorta = campoModoCultivo.value === 'HORTA';
+        blocoTamanhoVaso.hidden = ehHorta;
+        blocoAreaHorta.hidden = !ehHorta;
+        campoTamanhoVaso.required = !ehHorta;
+        campoAreaHorta.required = ehHorta;
+    }
+
     function abrirFormulario(id) {
         const planta = plantas.find(function (item) { return item.id_estufa === id; });
         formulario.reset();
@@ -349,18 +361,23 @@ document.addEventListener('componentsLoaded', function () {
             campoNome.value = planta.nome_estufa;
             campoEspecie.value = String(planta.id_especie);
             campoDispositivo.value = planta.token_estufa;
+            campoModoCultivo.value = planta.modo_cultivo || 'VASO';
             campoTamanhoVaso.value = planta.tamanho_vaso || 'M';
+            campoAreaHorta.value = planta.area_m2 != null ? planta.area_m2 : '';
             campoVazaoBomba.value = planta.vazao_bomba_ml_s != null ? planta.vazao_bomba_ml_s : '';
         } else {
+            campoModoCultivo.value = 'VASO';
             campoTamanhoVaso.value = 'M';
+            campoAreaHorta.value = '';
         }
+        alternarModoCultivo();
         abrirModal(modalPlanta);
         campoNome.focus();
     }
 
-    // Busca a lista real de estufas do usuário e, pra cada uma, a leitura
-    // mais recente (reaproveita a inicial do window.GREENDUINO pra estufa
-    // que já veio renderizada no HTML, evitando uma chamada extra).
+    campoModoCultivo.addEventListener('change', alternarModoCultivo);
+
+
     async function carregarPlantas() {
         const estufas = await api(`/api/estufas/usuario/${GREENDUINO.idUsuario}`);
         plantas = await Promise.all(estufas.map(async function (estufa) {
@@ -376,9 +393,7 @@ document.addEventListener('componentsLoaded', function () {
         }));
     }
 
-    // Troca a planta acompanhada: renderiza na hora com o que já se tem em
-    // memória, e busca a leitura mais atual em segundo plano (os dados
-    // carregados no início da sessão podem já estar com alguns minutos).
+
     async function selecionarPlanta(novoId) {
         idEstufa = novoId;
         renderizarCultivo();
@@ -387,7 +402,7 @@ document.addEventListener('componentsLoaded', function () {
             const planta = plantas.find(function (item) { return item.id_estufa === novoId; });
             if (planta) planta.dadosAtuais = atual;
         } catch (erro) {
-            // Mantém os últimos dados conhecidos em caso de falha de rede.
+           
         }
         if (idEstufa === novoId) renderizarCultivo();
     }
@@ -415,11 +430,19 @@ document.addEventListener('componentsLoaded', function () {
             return;
         }
 
+        const ehHorta = campoModoCultivo.value === 'HORTA';
+        if (ehHorta && !(Number(campoAreaHorta.value) > 0)) {
+            escrever('erro-formulario', 'Informe a área da horta em m² (maior que zero).');
+            return;
+        }
+
         const corpo = {
             nome_estufa: nome,
             id_especie: Number(campoEspecie.value),
             token_estufa: token,
+            modo_cultivo: campoModoCultivo.value,
             tamanho_vaso: campoTamanhoVaso.value,
+            area_m2: ehHorta ? Number(campoAreaHorta.value) : null,
             vazao_bomba_ml_s: campoVazaoBomba.value ? Number(campoVazaoBomba.value) : null
         };
 
